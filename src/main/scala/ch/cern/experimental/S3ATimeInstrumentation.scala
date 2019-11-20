@@ -93,7 +93,10 @@ class S3ATimeInstrumentation extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin {
       override def init(myContext:PluginContext, extraConf:JMap[String, String])  = {
-        s3aMetrics(myContext.metricRegistry)
+        // Don't register executor plugin if in local mode
+        if (! myContext.conf.get("spark.master").startsWith("local")) {
+          s3aMetrics(myContext.metricRegistry)
+        }
       }
     }
   }

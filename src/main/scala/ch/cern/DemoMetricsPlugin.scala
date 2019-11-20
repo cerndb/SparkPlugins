@@ -34,11 +34,14 @@ class DemoMetricsPlugin extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin {
       override def init(myContext:PluginContext, extraConf:JMap[String, String])  = {
-        val metricRegistry = myContext.metricRegistry
         // Gauge for testing
-        metricRegistry.register(MetricRegistry.name("ExecutorTest42"), new Gauge[Int] {
-          override def getValue: Int = 42
-        })
+        // Don't register executor plugin if in local mode
+        if (! myContext.conf.get("spark.master").startsWith("local")) {
+          val metricRegistry = myContext.metricRegistry
+          metricRegistry.register(MetricRegistry.name("ExecutorTest42"), new Gauge[Int] {
+            override def getValue: Int = 42
+          })
+        }
       }
     }
   }

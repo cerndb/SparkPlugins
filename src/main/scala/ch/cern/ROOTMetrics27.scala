@@ -68,7 +68,10 @@ class ROOTMetrics27 extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin {
       override def init(myContext:PluginContext, extraConf:JMap[String, String])  = {
-        rootMetrics(myContext.metricRegistry)
+        // Don't register executor plugin if in local mode
+        if (! myContext.conf.get("spark.master").startsWith("local")) {
+          rootMetrics(myContext.metricRegistry)
+        }
       }
     }
   }
