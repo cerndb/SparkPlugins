@@ -30,22 +30,27 @@ for additional background on the Spark metrics system on how it can be used to b
 Spark performance dashboards.
 
 ## Plugins: examples and filesystem instrumentation 
-  - DemoPlugin
-     - basic plugin, for demo and testing
-  - DemoMetricsPlugin
-    - example plugin illustrating integration with Spark metrics system 
-  - RunOSCommandPlugin
+  - Demos and basic
+    - DemoPlugin
+      - basic plugin, for demo and testing
+    - DemoMetricsPlugin
+      - example plugin illustrating integration with Spark metrics system 
+    - RunOSCommandPlugin
      - simple plugin, illustrating startup action, for demo and testing
-  - HDFSMetrics32
-    - collects extended HDFS metrics using GlobalFilesystemStatistics API, use with Hadoop 2.8 and higher
-  - OCIMetrics27
-    - collects metrics for the OCI-hdfs-connector, an S3 wrapper for OCI, use with Hadoop 2.7 and higher 
-  - ROOTMetrics27
-    - collects metrics for the Hadoop-XRootD connector, used by CERN EOS storage, use with Hadoop 2.7 and higher 
-  - S3AMetrics27 
-     - collects S3A metrics, use with for Hadoop 2.7 and higher 
-  - S3AMetrics32
-     - collects extended S3A metrics, use with for Hadoop 2.8 and higher 
+  - Cgroup instrumentation of key system resource usage, intended mostly for Spark on containers/Kubernetes
+    - CgroupMetrics
+      - collects metrics from CGroup /sys/fs and from /proc filesystem for CPU, Memory and Network usage 
+  - Hadoop I/O metrics
+    - HDFSMetrics32
+      - collects extended HDFS metrics using GlobalFilesystemStatistics API, use with Hadoop 2.8 and higher
+    - OCIMetrics27
+      - collects metrics for the OCI-hdfs-connector, an S3 wrapper for OCI, use with Hadoop 2.7 and higher 
+    - ROOTMetrics27
+      - collects metrics for the Hadoop-XRootD connector, used by CERN EOS storage, use with Hadoop 2.7 and higher 
+    - S3AMetrics27 
+      - collects S3A metrics, use with for Hadoop 2.7 and higher 
+    - S3AMetrics32
+      - collects extended S3A metrics, use with for Hadoop 2.8 and higher 
 
 ## Experimental plugins
 - Experimental plugins exposing metrics for I/O-time instrumentation of Hadoop-compliant filesystems.
