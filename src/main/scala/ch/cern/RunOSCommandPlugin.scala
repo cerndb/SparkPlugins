@@ -24,6 +24,7 @@ class RunOSCommandPlugin extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin() {
       val command = "/usr/bin/touch /tmp/plugin.txt"
+      // val command = "./myscript.sh" // use --files myscript.sh to distribute to the executors
       override def init(myContext: PluginContext, extraConf: JMap[String, String]): Unit = {
         // Run the OS command, this is an example, customize and add error and stdout management as needed
         val process = Process(command).lineStream

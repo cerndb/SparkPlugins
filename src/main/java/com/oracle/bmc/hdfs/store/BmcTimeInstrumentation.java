@@ -16,17 +16,15 @@
 
 package com.oracle.bmc.hdfs.store;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/* This class implements instrumentation for BMCFSInputStream and BMCOutputStream
+/* This class implements instrumentation for BMCFSInputStream
  * In particular it implements time measurement, introduced for performance troubleshooting
- * of Spark workloads
+ * of Apache Spark workloads
+ * See also: https://github.com/cerndb/SparkPlugins
  * BytesRead are also implemented for completeness, although already available via
  * standard Hadoop Statistics instrumentation.
- * ReadCalls is also implemented, although of limited utility as it is not the the number of read
- * operations,the difference comes from prefetching/readahead.
- * For HadoopFS statistics, see: org.apache.hadoop.fs.FileSystem.printStatistics()
+ * For standard HadoopFS statistics, see: org.apache.hadoop.fs.FileSystem.printStatistics()
  */
 
 public class BmcTimeInstrumentation {
@@ -34,8 +32,6 @@ public class BmcTimeInstrumentation {
     private static AtomicLong timeElapsedSeekTime = new AtomicLong();
     private static AtomicLong timeCPUDuringReadMusec = new AtomicLong();
     private static AtomicLong timeCPUDuringSeekMusec = new AtomicLong();
-    private static AtomicInteger readCalls = new AtomicInteger();
-    private static AtomicInteger seekCalls = new AtomicInteger();
     private static AtomicLong bytesRead = new AtomicLong();
 
     /* Time spent for read calls in BMCInputStream */
@@ -76,26 +72,6 @@ public class BmcTimeInstrumentation {
         timeElapsedSeekTime.getAndAdd(incrementTime);
     }
 
-    /* number of read calls in BMCInputStream, due to buffering/readahead this is not the number of
-    * read operations, for that metrics see standard Hadoop statics
-    */
-    public static int getReadCalls() {
-        return readCalls.get();
-    }
-
-    public static void incrementReadCalls(int numOps) {
-        readCalls.getAndAdd(numOps);
-    }
-
-    /* number of seek operation calls in BMCInputStream */
-    public static int getSeekCalls() {
-        return seekCalls.get();
-    }
-
-    public static void incrementSeekCalls(int numOps) {
-        seekCalls.getAndAdd(numOps);
-    }
-
     /* bytes read in BMCInputStream */
     public static long getBytesRead() {
         return bytesRead.get();
@@ -104,7 +80,5 @@ public class BmcTimeInstrumentation {
     public static void incrementBytesRead(Long incrementBytesRead) {
         bytesRead.getAndAdd(incrementBytesRead);
     }
-
-    /* TODO: implement metrics for output stream */
 
 }

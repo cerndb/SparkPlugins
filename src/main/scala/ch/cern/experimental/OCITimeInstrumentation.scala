@@ -57,18 +57,6 @@ class OCITimeInstrumentation extends SparkPlugin {
       }
     })
 
-    metricRegistry.register(MetricRegistry.name("OCIReadCalls"), new Gauge[Int] {
-      override def getValue: Int = {
-        com.oracle.bmc.hdfs.store.BmcTimeInstrumentation.getReadCalls
-      }
-    })
-
-    metricRegistry.register(MetricRegistry.name("OCISeekCalls"), new Gauge[Int] {
-      override def getValue: Int = {
-        com.oracle.bmc.hdfs.store.BmcTimeInstrumentation.getSeekCalls
-      }
-    })
-
   }
 
   /**

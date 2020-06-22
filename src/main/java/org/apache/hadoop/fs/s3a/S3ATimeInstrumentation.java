@@ -15,213 +15,144 @@
  */
 package org.apache.hadoop.fs.s3a;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class S3ATimeInstrumentation {
 
     private static AtomicLong timeElapsedReadMusec = new AtomicLong();
     private static AtomicLong timeElapsedSeekMusec = new AtomicLong();
-    private static AtomicLong timeElapsedWriteMusec = new AtomicLong();
     private static AtomicLong timeCPUDuringReadMusec = new AtomicLong();
     private static AtomicLong timeCPUDuringSeekMusec = new AtomicLong();
-    private static AtomicInteger readCalls = new AtomicInteger();
-    private static AtomicInteger seekCalls = new AtomicInteger();
-    private static AtomicInteger writeCalls = new AtomicInteger();
+    private static AtomicLong timeGetObjectMetadata = new AtomicLong();
+    private static AtomicLong timeCPUGetObjectMetadata = new AtomicLong();
     private static AtomicLong bytesRead = new AtomicLong();
-    private static AtomicLong bytesWritten = new AtomicLong();
 
     /**
-     * Get the cumulative value of the elapsed time spent  by
-     * the Hadoop Filesystem client waiting for S3A to return data of read
-     * operations. The time is in microseconds.
-     * Use from Hadoop clients, such as Spark environments, by calling
-     * ch.cern.eos.S3AInstrumentation.getTimeElapsedReadMusec()
+     * Increment the value of the cumulative elapsed time spent in read operations.
      *
-     * @return cumulative elapsed time spend in read operations, in microseconds.
-     */
-    public static long getTimeElapsedReadMusec() {
-        return timeElapsedReadMusec.get();
-    }
-
-    /**
-     * Increment the value of the cumulative elapsed time spent  by
-     * Hadoop Filesystem clients waiting for S3A to return data of read
-     * operations. The time is in microseconds.
-     *
-     * @param incrementTime the time to add to the cumulative value, in microseconds
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
      */
     public static void incrementTimeElapsedReadOps(Long incrementTime) {
         timeElapsedReadMusec.getAndAdd(incrementTime);
     }
 
     /**
-     * Increment the value of the cumulative elapsed time spent  by
-     * Hadoop Filesystem clients waiting for S3A to return data of seek
-     * operations. The time is in microseconds.
+     * Increment the value of the cumulative CPU time spent in read operations.
      *
-     * @param incrementTime the time to add to the cumulative value, in microseconds
-     */
-    public static void incrementTimeElapsedSeekOps(Long incrementTime) {
-        timeElapsedSeekMusec.getAndAdd(incrementTime);
-    }
-
-    /**
-     * Increment the value of the cumulative CPU time spent by
-     * Hadoop Filesystem clients while waiting for S3A to return data of read
-     * operations. The time is in microseconds.
-     *
-     * @param incrementTime the time to add to the cumulative value, in microseconds
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
      */
     public static void incrementCPUTimeDuringRead(Long incrementTime) {
         timeCPUDuringReadMusec.getAndAdd(incrementTime);
     }
 
     /**
-     * Increment the value of the cumulative CPU time spent by
-     * Hadoop Filesystem clients while waiting for S3A to return data of seek
-     * operations. The time is in microseconds.
+     * Increment the value of the cumulative CPU time spent in seek operations.
      *
-     * @param incrementTime the time to add to the cumulative value, in microseconds
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
      */
     public static void incrementCPUTimeDuringSeek(Long incrementTime) {
         timeCPUDuringSeekMusec.getAndAdd(incrementTime);
     }
 
     /**
-     * Get the cumulative value of the elapsed time spent  by
-     * the Hadoop Filesystem client waiting for S3A to perform seek
-     * operations. The time is in microseconds.
+     * Increment the value of the cumulative elapsed time spent in seek operations.
      *
-     * @return cumulative elapsed time spend in write operations, in microseconds.
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
+     */
+    public static void incrementTimeElapsedSeekOps(Long incrementTime) {
+        timeElapsedSeekMusec.getAndAdd(incrementTime);
+    }
+
+    /**
+     * Increment the value of the cumulative elapsed time spent in getObjectMetadata operations.
+     *
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
+     */
+    public static void incrementTimeGetObjectMetadata(Long incrementTime) {
+        timeGetObjectMetadata.getAndAdd(incrementTime);
+    }
+
+    /**
+     * Increment the value of the cumulative CPU time spent in getObjectMetadata operations.
+     *
+     * @param incrementTime the time to add to the cumulative value, in microseconds.
+     */
+    public static void incrementTimeCPUGetObjectMetadata(Long incrementTime) {
+        timeCPUGetObjectMetadata.getAndAdd(incrementTime);
+    }
+
+    /**
+     * Increment the value of the cumulative bytes read..
+     *
+     * @param incrementBytesRead bytes to add to the cumulative value.
      */
 
+    public static void incrementBytesRead(Long incrementBytesRead) {
+        bytesRead.getAndAdd(incrementBytesRead);
+    }
+
+    /**
+     * Get the cumulative value of the elapsed time spent in seek operations.
+     *
+     * @return cumulative elapsed time spent in read operations, in microseconds.
+     */
     public static long getTimeElapsedSeekMusec() {
         return timeElapsedSeekMusec.get();
     }
 
     /**
-     * Get the cumulative value of the CPU time spent  by
-     * the Hadoop Filesystem client while waiting for S3A to perform read
-     * operations. The time is in microseconds.
+     * Get the cumulative value of the CPU time spent in read operations.
      *
-     * @return cumulative elapsed time spend in write operations, in microseconds.
+     * @return cumulative CPU time spent in read operations, in microseconds.
      */
     public static long getCPUTimeDuringReadMusec() {
         return timeCPUDuringReadMusec.get();
     }
 
     /**
-     * Get the cumulative value of the CPU time spent  by
-     * the Hadoop Filesystem client while waiting for S3A to perform seek
-     * operations. The time is in microseconds.
+     * Get the cumulative value of the elapsed time spent in read operations.
      *
-     * @return cumulative elapsed time spend in write operations, in microseconds.
+     * @return cumulative elapsed time spent in read operations, in microseconds.
+     */
+    public static long getTimeElapsedReadMusec() {
+        return timeElapsedReadMusec.get();
+    }
+
+    /**
+     * Get the cumulative value of the CPU time spent in seek operations.
+     *
+     * @return cumulative CPU time spent in seek operations, in microseconds.
      */
     public static long getCPUTimeDuringSeekMusec() {
         return timeCPUDuringSeekMusec.get();
     }
 
     /**
-     * Not yet implemented
+     * Get the cumulative value of the time spent in getObjectMetadata operations.
+     *
+     * @return cumulative time spent in getObjectMetadata operations, in microseconds.
      */
-    public static long getTimeElapsedWriteMusec() {
-        return timeElapsedWriteMusec.get();
+    public static long getTimeGetObjectMetadata() {
+        return timeGetObjectMetadata.get();
     }
 
     /**
-     * Increment the value of the cumulative elapsed time spent  by
-     * Hadoop Filesystem clients waiting for S3A to return data of write
-     * operations. The time is in microseconds.
+     * Get the cumulative value of the CPU time spent in getObjectMetadata operations.
      *
-     * @param incrementTime the time to add to the cumulative value, in microseconds
+     * @return cumulative CPU time spent in getObjectMetadata operations, in microseconds.
      */
-    public static void incrementTimeElapsedWriteOps(Long incrementTime) {
-        timeElapsedWriteMusec.getAndAdd(incrementTime);
+    public static long getTimeCPUGetObjectMetadata() {
+        return timeCPUGetObjectMetadata.get();
     }
 
     /**
-     * Get the cumulative value of the number of bytes read  by
-     * the Hadoop Filesystem client through the S3A connector
+     * Get the cumulative value of bytes read.
      *
-     * @return cumulative bytes read with read operations.
+     * @return cumulative bytes read by S3AInputStream (redundant with standard instrumentation,
+     * it is there for diagnostic purposes).
      */
     public static long getBytesRead() {
         return bytesRead.get();
     }
 
-    /**
-     * Increment the value of the cumulative number of bytes read by
-     * the Hadoop Filesystem clients reading from S3A
-     *
-     * @param incrementBytesRead number of bytes to add to the counter of bytes read.
-     */
-    public static void incrementBytesRead(Long incrementBytesRead) {
-        bytesRead.getAndAdd(incrementBytesRead);
-    }
-
-    /**
-     * Get the cumulative value of the number of bytes written  by
-     * the Hadoop Filesystem client through the S3A connector
-     *
-     * @return cumulative bytes written via write operations.
-     */
-    public static long getBytesWritten() {
-        return bytesWritten.get();
-    }
-
-    /**
-     * Increment the value of the cumulative number of bytes read by
-     * the Hadoop Filesystem clients reading from S3A
-     *
-     * @param incrementBytesWritten number of bytes to add to the counter of bytes read.
-     */
-    public static void incrementBytesWritten(Long incrementBytesWritten) {
-        bytesWritten.getAndAdd(incrementBytesWritten);
-    }
-
-    /**
-     * Get the cumulative value of the number of read operations performed by
-     * the Hadoop Filesystem client through the S3A connector.
-     *
-     * @return cumulative number of read operations.
-     */
-    public static int getReadCalls() {
-        return readCalls.get();
-    }
-
-    /**
-     * Increment the counter of the cumulative number of read operations performed by
-     * the Hadoop Filesystem clients reading from S3A.
-     *
-     * @param numOps increment the counter of read operations.
-     */
-    public static void incrementReadCalls(int numOps) {
-        readCalls.getAndAdd(numOps);
-    }
-
-    public static int getSeekCalls() {
-        return seekCalls.get();
-    }
-    public static void incrementSeekCalls(int numOps) {
-        seekCalls.getAndAdd(numOps);
-    }
-
-    /**
-     * Get the cumulative value of the number of write operations performed by
-     * the Hadoop Filesystem client through the S3A connector.
-     *
-     * @return cumulative number of write operations.
-     */
-    public static int getWriteCalls() { return writeCalls.get(); }
-
-    /**
-     * Increment the counter of the cumulative number of write operations performed by
-     * the Hadoop Filesystem clients writing to S3A.
-     *
-     * @param numOps increment the counter of write operations.
-     */
-    public static void incrementWriteCalls(int numOps) {
-        writeCalls.getAndAdd(numOps);
-    }
 }
