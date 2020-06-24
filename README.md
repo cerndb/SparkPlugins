@@ -1,4 +1,6 @@
 # SparkPlugins
+![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg)
+
 Code and examples of how to use Apache Spark Plugin extensions with Apache Spark 3.0.
 
 ---
