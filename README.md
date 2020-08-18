@@ -17,7 +17,8 @@ Plugin notes:
 - Plugins configuration: `--conf spark.plugins=<list of plugin classes>`
 - Plugin JARs need to be made available to Spark executors
   - when using YARN, `--jars` can be used to distribute the code
-  - when using K8S --jars distribution will not work, you will need to make the JAR available in the Spark container. 
+  - when using K8S in Spark 3.0.0 --jars distribution will not work, you will need to make the JAR available in the Spark container.
+    - this is now fixed by SPARK-32119 
 - More details at [Spark monitoring documentation](https://spark.apache.org/docs/latest/monitoring.html#advanced-instrumentation)
 
 
