@@ -1,6 +1,7 @@
 package ch.cern
 
 import java.util.{Map => JMap}
+import scala.collection.JavaConverters._
 
 import com.codahale.metrics.{Gauge, MetricRegistry}
 import org.apache.spark.SparkContext
@@ -95,42 +96,32 @@ class CgroupMetrics extends SparkPlugin {
 
   }
 
-    /**
-   * Return the plugin's driver-side component.
-   *
-   * @return The driver-side component, or set to null if one is not needed.
-   */
+  // Return the plugin's driver-side component.
+  // register metrics conditional to --conf spark.cernSparkPlugin.registerOnDriver=true
   override def driverPlugin(): DriverPlugin = {
     new DriverPlugin() {
       override def init(sc: SparkContext, myContext: PluginContext): JMap[String, String] = {
-        cgroupCPUMetrics(myContext.metricRegistry)
-        cgroupMemoryMetrics(myContext.metricRegistry)
-        cgroupNetworkMetrics(myContext.metricRegistry)
-        null
-      }
-    }
-  }
-
-  /**
-   * Return the plugin's executor-side component.
-   * Run an OS command at executor startup
-   *
-   * @return The executor-side component, or set to null if one is not needed.
-   */
-  override def executorPlugin(): ExecutorPlugin = {
-    new ExecutorPlugin() {
-      override def init(myContext: PluginContext, extraConf: JMap[String, String]): Unit = {
-        // Don't register executor plugin if in local mode
-        if (! myContext.conf.get("spark.master").startsWith("local")) {
+        val registerOnDriver =
+          myContext.conf.getBoolean("spark.cernSparkPlugin.registerOnDriver", false)
+        if (registerOnDriver) {
           cgroupCPUMetrics(myContext.metricRegistry)
           cgroupMemoryMetrics(myContext.metricRegistry)
           cgroupNetworkMetrics(myContext.metricRegistry)
         }
+        Map.empty[String, String].asJava
+      }
+    }
+  }
+
+  // Return the plugin's executor-side component.
+  override def executorPlugin(): ExecutorPlugin = {
+    new ExecutorPlugin() {
+      override def init(myContext: PluginContext, extraConf: JMap[String, String]): Unit = {
+        cgroupCPUMetrics(myContext.metricRegistry)
+        cgroupMemoryMetrics(myContext.metricRegistry)
+        cgroupNetworkMetrics(myContext.metricRegistry)
       }
     }
   }
 
 }
-
-
-

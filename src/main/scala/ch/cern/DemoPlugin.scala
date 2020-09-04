@@ -1,6 +1,8 @@
 package ch.cern
 
 import java.util.{Map => JMap}
+import scala.collection.JavaConverters._
+
 import org.apache.spark.api.plugin.{DriverPlugin, ExecutorPlugin, PluginContext, SparkPlugin}
 import org.apache.spark.SparkContext
 
@@ -8,16 +10,12 @@ import org.apache.spark.SparkContext
 
 class DemoPlugin extends SparkPlugin {
 
-  /**
-   * Return the plugin's driver-side component.
-   *
-   * @return The driver-side component, or set to null if one is not needed.
-   */
+  // Return the plugin's driver-side component.
   override def driverPlugin(): DriverPlugin = {
     new DriverPlugin() {
       override def init(sc: SparkContext, myContext: PluginContext): JMap[String, String] = {
         DemoPlugin.numSuccessfulPlugins += 1
-        null
+        Map.empty[String, String].asJava
       }
 
       override def shutdown(): Unit = {
@@ -26,11 +24,7 @@ class DemoPlugin extends SparkPlugin {
     }
   }
 
-  /**
-   * Return the plugin's executor-side component.
-   *
-   * @return The executor-side component, or set to null if one is not needed.
-   */
+  // Return the plugin's executor-side component.
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin() {
       override def init(myContext: PluginContext, extraConf: JMap[String, String]): Unit = {

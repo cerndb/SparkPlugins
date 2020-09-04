@@ -5,28 +5,27 @@ import org.apache.spark.api.plugin.{DriverPlugin, ExecutorPlugin, PluginContext,
 import sys.process._
 
 // Basic example of Spark Executor Plugin in Scala
-
+// you can use this to execute a script
+// Parameter: spark.cernSparkPlugin.command
 class RunOSCommandPlugin extends SparkPlugin {
 
-  /**
-   * Return the plugin's driver-side component.
-   *
-   * @return The driver-side component, or set to null if one is not needed.
-   */
-  override def driverPlugin(): DriverPlugin =null
+  val defaultCommand = "/usr/bin/touch /tmp/plugin.txt"
+  // you can also use a script as command
+  // --conf spark.cernSparkPlugin.command="./myscript.sh"
+  // and use --files myscript.sh to distribute the script to the executors
 
-  /**
-   * Return the plugin's executor-side component.
-   * Run an OS command at executor startup
-   *
-   * @return The executor-side component, or set to null if one is not needed.
-   */
+  // Return the plugin's driver-side component.
+  // No action, for this example
+  override def driverPlugin(): DriverPlugin = null
+
+  // Return the plugin's executor-side component.
+  // This is an example plugin: run a configurable OS command at executor startup
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin() {
-      val command = "/usr/bin/touch /tmp/plugin.txt"
-      // val command = "./myscript.sh" // use --files myscript.sh to distribute to the executors
+
       override def init(myContext: PluginContext, extraConf: JMap[String, String]): Unit = {
         // Run the OS command, this is an example, customize and add error and stdout management as needed
+        val command = myContext.conf.get("spark.cernSparkPlugin.command", defaultCommand)
         val process = Process(command).lineStream
         DemoPlugin.numSuccessfulPlugins += 1
       }
@@ -39,6 +38,8 @@ class RunOSCommandPlugin extends SparkPlugin {
 
 }
 
+// Additional code to demonstrate the use of an associated object
+// for example to implement helper value stores and registries.
 object RunOSCommandPlugin {
   var numSuccessfulPlugins : Int = 0
   var numSuccessfulTerminations: Int = 0
