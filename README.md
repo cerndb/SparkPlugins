@@ -95,7 +95,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
 
 ### Plugins to collect I/O storage statistics for HDFS and Hadoop Compatible Filesystems
 
- ####HDFS extended storage statistics
+#### HDFS extended storage statistics
   - [HDFSMetricsGSS](src/main/scala/ch/cern/HDFSMetricsGSS.scala)
     - Configure with: `--conf spark.plugins=ch.cern.HDFSMetrics`
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)
@@ -116,7 +116,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
        - `bytesReadDistanceOfFiveOrLarger`
        - `bytesReadErasureCoded`
 
-####Cloud filesystem storage statistics
+#### Cloud filesystem storage statistics
   - [CloudFSMetrics](src/main/scala/ch/cern/CloudFSMetrics.scala)
     - Configure with: 
       - `--conf spark.plugins=ch.cern.CloudFSMetrics`
