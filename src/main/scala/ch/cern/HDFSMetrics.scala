@@ -47,7 +47,7 @@ class HDFSMetrics extends SparkPlugin {
     new DriverPlugin() {
       override def init(sc: SparkContext, myContext: PluginContext): JMap[String, String] = {
         val registerOnDriver =
-          myContext.conf.getBoolean("spark.cernSparkPlugin.registerOnDriver", false)
+          myContext.conf.getBoolean("spark.cernSparkPlugin.registerOnDriver", true)
         if (registerOnDriver) {
           hdfsMetrics(myContext)
         }

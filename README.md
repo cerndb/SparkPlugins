@@ -17,8 +17,8 @@ Plugin notes:
 - Plugins configuration: `--conf spark.plugins=<list of plugin classes>`
 - Plugin JARs need to be made available to Spark executors
   - when using YARN, `--jars` can be used to distribute the code
-  - when using K8S in Spark 3.0.0 --jars distribution will not work, you will need to make the JAR available in the Spark container.
-    - this is now fixed by SPARK-32119 
+  - when using Spark 3.0.1 on K8S, --jars distribution will not work, you will need to make the JAR available in the Spark container.
+    - this is fixed in SPARK-32119 
 - More details at [Spark monitoring documentation](https://spark.apache.org/docs/latest/monitoring.html#advanced-instrumentation)
 
 Author and contact: Luca.Canali@cern.ch 
@@ -98,7 +98,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
 #### HDFS extended storage statistics
   - [HDFSMetricsGSS](src/main/scala/ch/cern/HDFSMetricsGSS.scala)
     - Configure with: `--conf spark.plugins=ch.cern.HDFSMetrics`
-    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)
+    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)
     - Example: usage `bin/spark-shell --master yarn --num-executors 4 --executor-cores 8 --executor-memory 32g --jars <path>/scala-2.12/sparkplugins_2.12-0.1.jar --conf spark.plugins=ch.cern.HDFSMetrics`
     - Collects extended HDFS metrics using Hadoop's [GlobalStorageStatistics](https://hadoop.apache.org/docs/current/api/org/apache/hadoop/fs/GlobalStorageStatistics.html)
       implemented using Hadoop extended statistics metrics introduced in Hadoop 2.8.
@@ -121,7 +121,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
     - Configure with: 
       - `--conf spark.plugins=ch.cern.CloudFSMetrics`
       - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.) 
-    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)  
+    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystems using Hadoop's GlobalStorageStatistics API.   
       Note: use this with Spark built with Hadoop 3.2 (requires Hadoop client version 2.8 or higher).
     - Metrics (gauges) implemented have the prefix `ch.cern.S3AMetricsGSS`. List of metrics:
@@ -134,7 +134,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
     - Configure with: 
       - `--conf spark.plugins=ch.cern.CloudFSMetrics27`
       - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.)
-    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)  
+    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystem using Hadoop 2.7 API, use with Spark built with Hadoop 2.7
     - Metrics are the same as for CloudFSMetrics, they the prefix `ch.cern.CloudFSMetrics27`.
 
