@@ -10,6 +10,8 @@ import org.apache.spark.SparkContext
 
 import org.apache.hadoop.fs.FileSystem
 
+import org.slf4j.LoggerFactory
+
 /**
  * Instrument Cloud FS I/0 using Hadoop 2.7 client API for FileSystem.getAllStatistics
  * Note this API is deprecated in more recent versions of Hadoop.
@@ -18,43 +20,49 @@ import org.apache.hadoop.fs.FileSystem
  *
  * Parameters:
  * filesystem name:
- *   --conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem> (example: s3a)
+ *   --conf spark.cernSparkPlugin.cloudFsName=<name of the Hadoop compatible filesystem> (example: s3a)
  * register metrics on the driver conditional to
  *   --conf spark.cernSparkPlugin.registerOnDriver=true
  *
  */
 class CloudFSMetrics27 extends SparkPlugin {
 
-  def s3aMetrics(myContext: PluginContext): Unit= {
+  lazy val logger = LoggerFactory.getLogger(this.getClass.getName)
 
-    val fsName = myContext.conf.get("spark.cernSparkPlugin.cloudFsName")
+  def cloudFilesystemMetrics(myContext: PluginContext): Unit= {
+
+    val fsName = myContext.conf.getOption("spark.cernSparkPlugin.cloudFsName")
+    if (fsName.isEmpty) {
+      logger.error("spark.cernSparkPlugin.cloudFsName needs to be set when using the ch.cern.CloudFSMetrics Plugin.")
+      throw new IllegalArgumentException
+    }
     val metricRegistry = myContext.metricRegistry
 
     metricRegistry.register(MetricRegistry.name("bytesRead"), new Gauge[Long] {
       override def getValue: Long = {
-        val hdfsStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
-        hdfsStats.map(_.getBytesRead).getOrElse(0L)
+        val cloudFSStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
+        cloudFSStats.map(_.getBytesRead).getOrElse(0L)
       }
     })
 
     metricRegistry.register(MetricRegistry.name("bytesWritten"), new Gauge[Long] {
       override def getValue: Long = {
-        val hdfsStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
-        hdfsStats.map(_.getBytesWritten).getOrElse(0L)
+        val cloudFSStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
+        cloudFSStats.map(_.getBytesWritten).getOrElse(0L)
       }
     })
 
     metricRegistry.register(MetricRegistry.name("readOps"), new Gauge[Int] {
       override def getValue: Int = {
-        val hdfsStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
-        hdfsStats.map(_.getReadOps).getOrElse(0)
+        val cloudFSStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
+        cloudFSStats.map(_.getReadOps).getOrElse(0)
       }
     })
 
     metricRegistry.register(MetricRegistry.name("writeOps"), new Gauge[Int] {
       override def getValue: Int = {
-        val hdfsStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
-        hdfsStats.map(_.getWriteOps).getOrElse(0)
+        val cloudFSStats = FileSystem.getAllStatistics().asScala.find(s => s.getScheme.equals(fsName))
+        cloudFSStats.map(_.getWriteOps).getOrElse(0)
       }
     })
 
@@ -68,7 +76,7 @@ class CloudFSMetrics27 extends SparkPlugin {
         val registerOnDriver =
           myContext.conf.getBoolean("spark.cernSparkPlugin.registerOnDriver", true)
         if (registerOnDriver) {
-          s3aMetrics(myContext)
+          cloudFilesystemMetrics(myContext)
         }
         Map.empty[String, String].asJava
       }
@@ -79,7 +87,7 @@ class CloudFSMetrics27 extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin {
       override def init(myContext:PluginContext, extraConf:JMap[String, String])  = {
-          s3aMetrics(myContext)
+        cloudFilesystemMetrics(myContext)
       }
     }
   }

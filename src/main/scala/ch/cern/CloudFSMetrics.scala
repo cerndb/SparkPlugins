@@ -10,6 +10,9 @@ import org.apache.spark.SparkContext
 
 import org.apache.hadoop.fs.FileSystem.getGlobalStorageStatistics
 
+import org.slf4j.LoggerFactory
+
+
 /**
  * Monitor S3A I/0 metrics using Hadoop's API FileSystem.getGlobalStorageStatistics
  * FileSystem.getGlobalStorageStatistics has been introduced in Hadoop (client) version 2.8
@@ -20,7 +23,7 @@ import org.apache.hadoop.fs.FileSystem.getGlobalStorageStatistics
  *
  * Parameters:
  * filesystem name:
- *   --conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem> (example: s3a)
+ *   --conf spark.cernSparkPlugin.cloudFsName=<name of the Hadoop compatible filesystem> (example: s3a)
  * register metrics on the driver conditional to
  *   --conf spark.cernSparkPlugin.registerOnDriver=true
  *
@@ -28,16 +31,21 @@ import org.apache.hadoop.fs.FileSystem.getGlobalStorageStatistics
 class CloudFSMetrics extends SparkPlugin {
 
   val fsMetrics = Seq("bytesRead", "bytesWritten", "readOps", "writeOps")
+  lazy val logger = LoggerFactory.getLogger(this.getClass.getName)
 
   // This registers the metrics and their getValue method
   // Note: getGlobalStorageStatistics.get("fsName") will return null till the first use of "fsName"
-  def hdfsMetrics(myContext: PluginContext): Unit= {
-    val fsName = myContext.conf.get("spark.cernSparkPlugin.cloudFsName")
+  def cloudFilesystemMetrics(myContext: PluginContext): Unit= {
+    val fsName = myContext.conf.getOption("spark.cernSparkPlugin.cloudFsName")
+    if (fsName.isEmpty) {
+      logger.error("spark.cernSparkPlugin.cloudFsName needs to be set when using the ch.cern.CloudFSMetrics Plugin.")
+      throw new IllegalArgumentException
+    }
     val metricRegistry = myContext.metricRegistry
     fsMetrics.foreach ( name =>
       metricRegistry.register(MetricRegistry.name(name), new Gauge[Long] {
         override def getValue: Long = {
-          val fsStats = getGlobalStorageStatistics.get(fsName)
+          val fsStats = getGlobalStorageStatistics.get(fsName.get)
           fsStats match {
             case null => 0L
             case _ => fsStats.getLong(name)
@@ -55,7 +63,7 @@ class CloudFSMetrics extends SparkPlugin {
         val registerOnDriver =
           myContext.conf.getBoolean("spark.cernSparkPlugin.registerOnDriver", true)
         if (registerOnDriver) {
-          hdfsMetrics(myContext)
+          cloudFilesystemMetrics(myContext)
         }
         Map.empty[String, String].asJava
       }
@@ -66,7 +74,7 @@ class CloudFSMetrics extends SparkPlugin {
   override def executorPlugin(): ExecutorPlugin = {
     new ExecutorPlugin() {
       override def init(myContext:PluginContext, extraConf:JMap[String, String])  = {
-        hdfsMetrics(myContext)
+        cloudFilesystemMetrics(myContext)
       }
     }
   }

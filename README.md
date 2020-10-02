@@ -4,22 +4,22 @@
 Code and examples of how to use Apache Spark Plugin extensions with Apache Spark 3.0.
 
 ---
-Apache Spark 3.0 comes with a new plugin framework [SPARK-29397](https://issues.apache.org/jira/browse/SPARK-29397), [SPARK-28091](https://issues.apache.org/jira/browse/SPARK-28091).  
-Plugins allow extending Spark monitoring functionality.
+Apache Spark 3.0 comes with a new plugin framework. Plugins allow extending Spark monitoring functionality.
 - One important use case is extending Spark instrumentation with custom metrics:
   OS metrics, I/O metrics, external applications monitoring, etc.
- - Note: The code in this repo will not work with Spark 2.x,
+- See also [SPARK-29397](https://issues.apache.org/jira/browse/SPARK-29397), [SPARK-28091](https://issues.apache.org/jira/browse/SPARK-28091).
+- Note: The code in this repo is for Spark 3.x. For Spark 2.x,
    see instead [Executor Plugins for Spark 2.4](https://github.com/cerndb/SparkExecutorPlugins2.4)
 
 Plugin notes:
+- [Spark monitoring documentation](https://spark.apache.org/docs/latest/monitoring.html#advanced-instrumentation)
 - Spark plugins implement the `org.apache.spark.api.Plugin` interface, they can be written in Scala or Java
  and can be used to run custom code at the startup of Spark executors and driver.  
 - Plugins configuration: `--conf spark.plugins=<list of plugin classes>`
 - Plugin JARs need to be made available to Spark executors
-  - when using YARN, `--jars` can be used to distribute the code
-  - when using Spark 3.0.1 on K8S, --jars distribution will not work, you will need to make the JAR available in the Spark container.
-    - this is fixed in SPARK-32119 
-- More details at [Spark monitoring documentation](https://spark.apache.org/docs/latest/monitoring.html#advanced-instrumentation)
+  - YARN: you can distribute the plugin code to the executors using `--jars`.
+  - K8S, when using Spark 3.0.1 on K8S, `--jars` distribution will **not work**, you will need to make the JAR available in the Spark container when you build it.
+    - [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119) fixes this issue and allows to use `--jars` to distribute plugin code. 
 
 Author and contact: Luca.Canali@cern.ch 
 
@@ -116,7 +116,7 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
        - `bytesReadDistanceOfFiveOrLarger`
        - `bytesReadErasureCoded`
 
-#### Cloud filesystem storage statistics
+#### Cloud filesystem storage statistics for Hadoop Compatible Filesystems
   - [CloudFSMetrics](src/main/scala/ch/cern/CloudFSMetrics.scala)
     - Configure with: 
       - `--conf spark.plugins=ch.cern.CloudFSMetrics`
@@ -129,6 +129,31 @@ and use an extended grafana dashboard with the Plugin metrics of interest.
        - `bytesWritten`
        - `readOps`
        - `writeOps`
+    - Example:
+         - Note this example is intended for a Spark build with [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119),
+           such as 3.1 (master) on K8S, for Spark 3.0.1 on K8S you need to build the container with the plugin jar.
+         ```
+         bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
+          --num-executors 2 --executor-cores 2 --executor-memory 2g \
+          --conf spark.kubernetes.container.image=<registry>/spark:v301 \
+          --jars <path_to_the_Plugin_jar>/sparkplugins_2.12-0.1.jar \
+          --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
+          --conf spark.cernSparkPlugin.cloudFsName="s3a" \
+          --packages org.apache.hadoop:hadoop-aws:3.2.0 \
+          --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
+          --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
+          --conf spark.hadoop.fs.s3a.endpoint="https://<S3A URL HERE>" \
+          --conf spark.hadoop.fs.s3a.impl="org.apache.hadoop.fs.s3a.S3AFileSystem" \
+          --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+          --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
+          --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
+          --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+          --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
+          --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
+          --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
+          --conf "spark.metrics.conf.*.sink.graphite.prefix"="luca" \
+          --conf "spark.metrics.conf.*.source.jvm.class"="org.apache.spark.metrics.source.JvmSource"
+         ```
 
   - [CloudFSMetrics27](src/main/scala/ch/cern/CloudFSMetrics27.scala) 
     - Configure with: 

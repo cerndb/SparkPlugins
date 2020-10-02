@@ -25,7 +25,7 @@ class HDFSMetrics extends SparkPlugin {
     "bytesReadDistanceOfFiveOrLarger", "bytesReadErasureCoded")
 
   // Note: getGlobalStorageStatistics.get("fsName") will return null till the first use of "fsName"
-  // This registers the metrics and their getValue method
+  // hdfsMetrics registers the metrics and their getValue method
   def hdfsMetrics(myContext: PluginContext): Unit= {
     val metricRegistry = myContext.metricRegistry
     fsMetrics.foreach ( name =>
