@@ -152,12 +152,12 @@ In particular it provides information on read locality and erasure coding usage 
 
 ### Cloud filesystem storage statistics for Hadoop Compatible Filesystems
 #### [CloudFSMetrics](src/main/scala/ch/cern/CloudFSMetrics.scala)
-This Plugin provides I/O statistics for Cloud Filesystem metrics (for S3A, GS, root, oci, azure, and any other
-filesystem exposed as a Hadoop Compatible Filesystem). 
+This Plugin provides I/O statistics for Cloud Filesystem metrics (for s3a, gs, wasbs, oci, root, and any other
+storage system exposed as a Hadoop Compatible Filesystem). 
 
   - Configure with: 
     - `--conf spark.plugins=ch.cern.CloudFSMetrics`
-    - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.) 
+    - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "gs", "wasbs", "root", "oci", etc.) 
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystems using Hadoop's GlobalStorageStatistics API.   
       Note: use this with Spark built with Hadoop 3.2 (requires Hadoop client version 2.8 or higher).
@@ -194,8 +194,8 @@ filesystem exposed as a Hadoop Compatible Filesystem).
    - Visualize the metrics with the Spark dashboard `spark_perf_dashboard_spark3-0_v02_with_sparkplugins`
 
 #### [CloudFSMetrics27](src/main/scala/ch/cern/CloudFSMetrics27.scala) 
-This Plugin provides I/O statistics for Cloud Filesystem metrics (for S3A, GS, root, oci, azure, and any other
-filesystem exposed as a Hadoop Compatible Filesystem). Use this for Spark built using Hadoop 2.7.
+This Plugin provides I/O statistics for Cloud Filesystem metrics (for s3a, gs, wasbs, oci, root, and any other
+storage system exposed as a Hadoop Compatible Filesystem). Use this for Spark built using Hadoop 2.7.
   - Configure with:
     - `--conf spark.plugins=ch.cern.CloudFSMetrics27`
     - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.)
