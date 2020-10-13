@@ -232,7 +232,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
         - `S3ASeekTimeMinusCPUMuSec`
         - `S3ABytesRead`
         - `S3AGetObjectMetadataMuSec`
-        - `S3AGetObjectMetadataCPUMuSec`
+        - `S3AGetObjectMetadataMinusCPUMuSec`
         
   - [HDFS Time Instrumentation](src/main/scala/ch/cern/experimental/HDFSTimeInstrumentation.scala) 
     - Instruments the Hadoop HDFS client.

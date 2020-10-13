@@ -63,8 +63,9 @@ class S3ATimeInstrumentation extends SparkPlugin {
       }
     })
 
-    metricRegistry.register(MetricRegistry.name("S3AGetObjectMetadataCPUMuSec"), new Gauge[Long] {
+    metricRegistry.register(MetricRegistry.name("S3AGetObjectMetadataMinusCPUMuSec"), new Gauge[Long] {
       override def getValue: Long = {
+        org.apache.hadoop.fs.s3a.S3ATimeInstrumentation.getTimeGetObjectMetadata -
         org.apache.hadoop.fs.s3a.S3ATimeInstrumentation.getTimeCPUGetObjectMetadata
       }
     })
