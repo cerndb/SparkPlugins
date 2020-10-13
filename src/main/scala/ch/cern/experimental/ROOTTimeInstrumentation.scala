@@ -26,7 +26,7 @@ class ROOTTimeInstrumentation extends SparkPlugin {
       }
     })
 
-    metricRegistry.register(MetricRegistry.name("ROOTTimeElapsedReadMusec"), new Gauge[Long] {
+    metricRegistry.register(MetricRegistry.name("ROOTReadTimeMuSec"), new Gauge[Long] {
       override def getValue: Long = {
         ch.cern.eos.XRootDInstrumentation.getTimeElapsedReadMusec
       }

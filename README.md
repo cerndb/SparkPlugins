@@ -92,7 +92,7 @@ Author and contact: Luca.Canali@cern.ch
     ```
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
-      --conf spark.kubernetes.container.image=
+      --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
       --jars <path>/sparkplugins_2.12-0.1.jar \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
@@ -172,7 +172,7 @@ storage system exposed as a Hadoop Compatible Filesystem).
          ```
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
-          --conf spark.kubernetes.container.image=<registry>/spark:v301 \
+          --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
           --jars <path_to_the_Plugin_jar>/sparkplugins_2.12-0.1.jar \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
@@ -214,15 +214,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Note: this requires custom S3A client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)  
     - Spark config:
       - `--conf spark.plugins=ch.cern.experimental.S3ATimeInstrumentation`
-      - Additional jar: `--jars hadoop-aws-3.2.0.jar` built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
-      ```
-      --jars <PATH>/hadoop-aws-3.2.0.jar, <PATH>/ sparkplugins_2.12-0.1.jar \ # Note for K8S rather add this to the container
-      --packages com.amazonaws:aws-java-sdk-bundle:1.11.804 \
-      --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
-      --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
-      --conf spark.hadoop.fs.s3a.endpoint="https://<URL HERE>" \
-      --conf spark.hadoop.fs.s3a.impl="org.apache.hadoop.fs.s3a.S3AFileSystem"
-      ```
+      - Custom jar needed: `--jars hadoop-aws-3.2.0.jar` built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Metrics implemented (gauges), with prefix `ch.cern.experimental.S3ATimeInstrumentation`:
         - `S3AReadTimeMuSec`
         - `S3ASeekTimeMuSec`
@@ -233,29 +225,63 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
         - `S3ABytesRead`
         - `S3AGetObjectMetadataMuSec`
         - `S3AGetObjectMetadataMinusCPUMuSec`
+
+    - Example:
+      - Note this example is intended for Spark build with [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119),
+        such as Spark 3.1 on K8S, for Spark 3.0.1 on K8S you need to build the container with the plugin jar.
+      ```
+      bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
+       --num-executors 2 --executor-cores 2 --executor-memory 2g \
+       --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
+       --jars <PATH>/hadoop-aws-3.2.0.jar, <PATH>/sparkplugins_2.12-0.1.jar \ # Note for Spark 3.0.1 on K8S rather add this to the container
+       --packages com.amazonaws:aws-java-sdk-bundle:1.11.880 \
+       --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
+       --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
+       --conf spark.hadoop.fs.s3a.endpoint="https://<URL HERE>" \
+       --conf spark.hadoop.fs.s3a.impl="org.apache.hadoop.fs.s3a.S3AFileSystem" \
+       --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+       --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
+       --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
+       --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+       --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
+       --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
+       --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
+       --conf "spark.metrics.conf.*.sink.graphite.prefix"="youridhere"
+      ```
         
+      - Visualize the metrics with the Spark dashboard `spark_perf_dashboard_spark3-0_v02_with_sparkplugins_experimental`
+
   - [HDFS Time Instrumentation](src/main/scala/ch/cern/experimental/HDFSTimeInstrumentation.scala) 
     - Instruments the Hadoop HDFS client.
     - Note: this requires custom HDFS client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Spark config:
       - `--conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation`
       - `--jars <PATH>/sparkplugins_2.12-0.1.jar`
-      - Hack required for testing: replace `$SPARK_HOME/jars/hadoop-hdfs-client-3.2.0.jar` with the jar built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
+      - Non-standard configuration required for using this instrumentation:  
+        - replace `$SPARK_HOME/jars/hadoop-hdfs-client-3.2.0.jar` with the jar built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Metrics implemented (gauges), with prefix `ch.cern.experimental.HDFSTimeInstrumentation`:
         - `HDFSReadTimeMuSec`
         - `HDFSCPUTimeDuringReadMuSec`
         - `HDFSReadTimeMinusCPUMuSec`
         - `HDFSBytesRead`
         - `HDFSReadCalls`
-        
+    - Example:
+    ```
+    bin/spark-shell --master yarn --num-executors 2 --executor-cores 2 \
+     --jars <PATH>/sparkplugins_2.12-0.1.jar \
+     --conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation 
+     ...NOTE: ADD here spark.metrics.conf parameters or configure metrics.conf> 
+    ```        
+    - Visualize the metrics with the Spark dashboard `spark_perf_dashboard_spark3-0_v02_with_sparkplugins_experimental`
+
   - [Hadoop-XRootD Time Instrumentation](src/main/scala/ch/cern/experimental/ROOTTimeInstrumentation.scala) 
     - Collects metrics for the Hadoop-XRootD connector 
     - Intended use is when using Spark with the CERN EOS (and CERN Box) storage system.
     - Additional details: [Hadoop-XRootD connector instrumentation](https://github.com/cerndb/hadoop-xrootd/blob/master/src/main/java/ch/cern/eos/XRootDInstrumentation.java) 
     - Spark config:
-      - `--conf spark.plugins=ch.cern.experimental.ROOTTimeInstrumentation`
       ```
-      --jars <PATH>/sparkplugins_2.12-0.1.jar \ # Note for K8S rather add this to the container
+      --conf spark.plugins=ch.cern.experimental.ROOTTimeInstrumentation \
+      --jars <PATH>/sparkplugins_2.12-0.1.jar \ # Note for Spark 3.0.1 on K8S rather add this to the container
       --conf spark.driver.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --conf spark.executor.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --files <path_to_krbtgt>#krbcache \
@@ -264,7 +290,9 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Metrics implemented (gauges), with prefix `ch.cern.experimental.ROOTTimeInstrumentation`:
         - `ROOTBytesRead`
         - `ROOTReadOps`
-        - `ROOTTimeElapsedReadMusec`
+        - `ROOTReadTimeMuSec`
+
+    - Visualize the metrics with the Spark dashboard `spark_perf_dashboard_spark3-0_v02_with_sparkplugins_experimental`
         
    - [OCITimeInstrumentation](src/main/scala/ch/cern/experimental/OCITimeInstrumentation.scala) 
     - instruments the HDFS connector to Oracle OCI storage.
