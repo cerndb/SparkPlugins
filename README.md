@@ -1,5 +1,6 @@
 # SparkPlugins
-![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg)
+![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg?branch=master&event=push)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
 A repo with code and examples of Apache Spark Plugin extensions to the metrics system
  applied to measuring I/O from cloud Filesystems, OS/system metrics and custom metrics.
