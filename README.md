@@ -25,6 +25,8 @@ Plugin notes:
 Author and contact: Luca.Canali@cern.ch 
 
 ## Getting Started  
+- Use from maven central
+  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
 - Build or download the SparkPlugin `jar`. For example:
   - Build from source with:
     ```
@@ -49,7 +51,7 @@ Author and contact: Luca.Canali@cern.ch
     - Example:
       ```
       bin/spark-shell --master yarn \ 
-        --jars <path>/sparkplugins_2.12-0.1.jar \
+        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
         --conf spark.plugins=ch.cern.RunOSCommandPlugin 
       ```
         - You can see if the plugin has run by checking that the file `/tmp/plugin.txt` has been
@@ -94,7 +96,7 @@ Author and contact: Luca.Canali@cern.ch
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
       --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
-      --jars <path>/sparkplugins_2.12-0.1.jar \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
@@ -136,7 +138,7 @@ In particular, it provides information on read locality and erasure coding usage
     - Example  
     ```
     bin/spark-shell --master yarn \
-      --jars <path>/sparkplugins_2.12-0.1.jar \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
       --conf spark.plugins=ch.cern.HDFSMetrics \
       --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
@@ -174,10 +176,9 @@ storage system exposed as a Hadoop Compatible Filesystem).
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
           --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
-          --jars <path_to_the_Plugin_jar>/sparkplugins_2.12-0.1.jar \
+          --packages org.apache.hadoop:hadoop-aws:3.2.0,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
-          --packages org.apache.hadoop:hadoop-aws:3.2.0 \
           --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
           --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
           --conf spark.hadoop.fs.s3a.endpoint="https://<S3A URL HERE>" \
@@ -238,8 +239,8 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
       bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
        --num-executors 2 --executor-cores 2 --executor-memory 2g \
        --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
-       --jars <PATH>/hadoop-aws-3.2.0.jar, <PATH>/sparkplugins_2.12-0.1.jar \ # Note for Spark 3.0.1 on K8S rather add this to the container
-       --packages com.amazonaws:aws-java-sdk-bundle:1.11.880 \
+       --jars <PATH>/hadoop-aws-3.2.0.jar
+       --packages com.amazonaws:aws-java-sdk-bundle:1.11.880,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \ # Note for Spark 3.0.1 on K8S rather add this to the container \
        --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
        --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
        --conf spark.hadoop.fs.s3a.endpoint="https://<URL HERE>" \
@@ -261,7 +262,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Note: this requires custom HDFS client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Spark config:
       - `--conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation`
-      - `--jars <PATH>/sparkplugins_2.12-0.1.jar`
+      - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
       - Non-standard configuration required for using this instrumentation:  
         - replace `$SPARK_HOME/jars/hadoop-hdfs-client-3.2.0.jar` with the jar built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
         - for convenience you can download a pre-built copy of the [hadoop-hdfs-client-3.2.0.jar at this link](https://cern.ch/canali/res/hadoop-hdfs-client-3.2.0.jar)
@@ -288,7 +289,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Spark config:
       ```
       --conf spark.plugins=ch.cern.experimental.ROOTTimeInstrumentation \
-      --jars <PATH>/sparkplugins_2.12-0.1.jar \ # Note for Spark 3.0.1 on K8S rather add this to the container
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \ # Note for Spark 3.0.1 on K8S rather add this to the container \
       --conf spark.driver.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --conf spark.executor.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --files <path_to_krbtgt>#krbcache \
@@ -313,7 +314,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
         copy and install the relevant [oracle/oci-java-sdk release jars](oci-java-sdk release jars):
           version 1.17.5: oci-java-sdk-full-1.17.5.jar and related third party jars.
       ```
-      --jars <PATH>/sparkplugins_2.12-0.1.jar \ # Note for K8S rather add this to the container
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \ # Note for K8S rather add this to the container \
       --conf spark.hadoop.fs.oci.client.auth.pemfilepath="<PATH>/oci_api_key.pem" \
       --conf spark.hadoop.fs.oci.client.auth.tenantId=ocid1.tenancy.oc1..TENNANT_KEY \
       --conf spark.hadoop.fs.oci.client.auth.userId=ocid1.user.oc1.USER_KEY \
