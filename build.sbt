@@ -1,7 +1,7 @@
 name := "spark-plugins"
 
-version := "0.1"
-isSnapshot := false
+version := "0.2-SNAPSHOT"
+isSnapshot := true
 
 scalaVersion := "2.12.10"
 
