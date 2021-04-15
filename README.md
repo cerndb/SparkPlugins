@@ -3,10 +3,10 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
 A repo with code and examples of Apache Spark Plugin extensions to the metrics system
- applied to measuring I/O from cloud Filesystems, OS/system metrics and custom metrics.
+ applied to measuring Spark on K8S, Spark I/O from cloud Filesystems, OS/system metrics and custom metrics.
  
 ---
-Apache Spark 3.0 comes with an improved plugin framework. Plugins allow extending Spark monitoring functionality.
+Apache Spark 3.x plugin framework is quite flexible. Plugins allow extending Spark monitoring functionality.
 - One important use case is extending Spark instrumentation with custom metrics:  
   OS metrics, I/O metrics, external applications monitoring, etc.
 - Note: The code in this repo is for Spark 3.x.  
@@ -17,16 +17,15 @@ Plugin notes:
  and can be used to run custom code at the startup of Spark executors and driver.  
 - Plugins basic configuration: `--conf spark.plugins=<list of plugin classes>`
 - Plugin JARs need to be made available to Spark executors
-  - YARN: you can distribute the plugin code to the executors using `--jars`.
-  - K8S, when using Spark 3.0.1 on K8S, `--jars` or `--packages` distribution will **not work**, you will need to make the JAR available in the Spark container when you build it.
-    - [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119) fixes this issue and allows to use `--jars` to distribute plugin code. 
+  - you can distribute the plugin code to the executors using `--jars` and `--packages`.
+  - for K8S you can also consider making it available directly in the container. 
 - Link to [Spark monitoring documentation](https://spark.apache.org/docs/latest/monitoring.html#advanced-instrumentation)
-- See also [SPARK-29397](https://issues.apache.org/jira/browse/SPARK-29397), [SPARK-28091](https://issues.apache.org/jira/browse/SPARK-28091).
+- See also [SPARK-29397](https://issues.apache.org/jira/browse/SPARK-29397), [SPARK-28091](https://issues.apache.org/jira/browse/SPARK-28091), [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119).
 
 Author and contact: Luca.Canali@cern.ch 
 
 ## Getting Started  
-- Use from maven central
+- Deploy the jar from maven central
   - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
 - Build or download the SparkPlugin `jar`. For example:
   - Build from source with:
@@ -91,18 +90,14 @@ Author and contact: Luca.Canali@cern.ch
       - `NetworkBytesOut`: network traffic outbound.
 
     - Example:
-       - Note this example is intended for Spark build with [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119),
-         such as Spark 3.1 on K8S, for Spark 3.0.1 on K8S you need to build the container with the plugin jar.
     ```
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
-      --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
+      --conf spark.kubernetes.container.image=<registry>/spark:v311 \
       --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
-      --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
-      --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
-      --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
-      --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+      --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+      --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
       --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
       --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
       --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
@@ -141,10 +136,8 @@ In particular, it provides information on read locality and erasure coding usage
     bin/spark-shell --master yarn \
       --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
       --conf spark.plugins=ch.cern.HDFSMetrics \
-      --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
-      --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
-      --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
-      --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+      --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+      --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
       --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
       --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
       --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
@@ -171,12 +164,10 @@ storage system exposed as a Hadoop Compatible Filesystem).
        - `readOps`
        - `writeOps`
     - Example:
-         - Note this example is intended for Spark build with [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119),
-           such as Spark 3.1 on K8S, for Spark 3.0.1 on K8S you need to build the container with the plugin jar.
          ```
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
-          --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
+          --conf spark.kubernetes.container.image=<registry>/spark:v311 \
           --packages org.apache.hadoop:hadoop-aws:3.2.0,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
@@ -184,10 +175,8 @@ storage system exposed as a Hadoop Compatible Filesystem).
           --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
           --conf spark.hadoop.fs.s3a.endpoint="https://<S3A URL HERE>" \
           --conf spark.hadoop.fs.s3a.impl="org.apache.hadoop.fs.s3a.S3AFileSystem" \
-          --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
-          --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
-          --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
-          --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+          --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+          --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
           --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
           --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
           --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
@@ -204,7 +193,7 @@ storage system exposed as a Hadoop Compatible Filesystem). Use this for Spark bu
     - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.)
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystem using Hadoop 2.7 API, use with Spark built with Hadoop 2.7
-    - Metrics are the same as for CloudFSMetrics, they the prefix `ch.cern.CloudFSMetrics27`.
+    - The metrics are the same as for CloudFSMetrics described above, with except for the prefix: `ch.cern.CloudFSMetrics27`.
 
 ---
 ## Experimental Plugins for I/O Time Instrumentation
@@ -234,22 +223,18 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
         - `S3AGetObjectMetadataMinusCPUMuSec`
 
     - Example:
-      - Note this example is intended for Spark build with [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119),
-        such as Spark 3.1 on K8S, for Spark 3.0.1 on K8S you need to build the container with the plugin jar.
       ```
       bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
        --num-executors 2 --executor-cores 2 --executor-memory 2g \
-       --conf spark.kubernetes.container.image=<registry>/spark:v310-SNAPSHOT \
+       --conf spark.kubernetes.container.image=<registry>/spark:v311 \
        --jars <PATH>/hadoop-aws-3.2.0.jar
-       --packages com.amazonaws:aws-java-sdk-bundle:1.11.880,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \ # Note for Spark 3.0.1 on K8S rather add this to the container \
+       --packages com.amazonaws:aws-java-sdk-bundle:1.11.880,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
        --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
        --conf spark.hadoop.fs.s3a.access.key="<ACCESS KEY HERE>" \
        --conf spark.hadoop.fs.s3a.endpoint="https://<URL HERE>" \
        --conf spark.hadoop.fs.s3a.impl="org.apache.hadoop.fs.s3a.S3AFileSystem" \
-       --conf "spark.metrics.conf.driver.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
-       --conf "spark.metrics.conf.executor.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"         \
-       --conf "spark.metrics.conf.driver.sink.graphite.host"=mytestinstance \
-       --conf "spark.metrics.conf.executor.sink.graphite.host"=mytestinstance \
+       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
+       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
        --conf "spark.metrics.conf.*.sink.graphite.port"=2003 \
        --conf "spark.metrics.conf.*.sink.graphite.period"=10 \
        --conf "spark.metrics.conf.*.sink.graphite.unit"=seconds \
@@ -266,7 +251,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
       - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
       - Non-standard configuration required for using this instrumentation:  
         - replace `$SPARK_HOME/jars/hadoop-hdfs-client-3.2.0.jar` with the jar built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
-        - for convenience you can download a pre-built copy of the [hadoop-hdfs-client-3.2.0.jar at this link](https://cern.ch/canali/res/hadoop-hdfs-client-3.2.0.jar)
+        - for convenience, you can download a pre-built copy of the [hadoop-hdfs-client-3.2.0.jar at this link](https://cern.ch/canali/res/hadoop-hdfs-client-3.2.0.jar)
 
     - Metrics implemented (gauges), with prefix `ch.cern.experimental.HDFSTimeInstrumentation`:
         - `HDFSReadTimeMuSec`
@@ -290,7 +275,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Spark config:
       ```
       --conf spark.plugins=ch.cern.experimental.ROOTTimeInstrumentation \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \ # Note for Spark 3.0.1 on K8S rather add this to the container \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
       --conf spark.driver.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --conf spark.executor.extraClassPath=<path>/hadoop-xrootd-1.0.5.jar \
       --files <path_to_krbtgt>#krbcache \
