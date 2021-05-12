@@ -157,8 +157,9 @@ storage system exposed as a Hadoop Compatible Filesystem).
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystems using Hadoop's GlobalStorageStatistics API.   
       - Note: use this with Spark built with Hadoop 3.2 (requires Hadoop client version 2.8 or higher).
-      - Spark also allows to measure filesystem metrics using `spark.executor.metrics.fileSystemSchemes` (default: `file,hdfs`)
-        however in Spark (up to 3.1) this is done using Hadoop Filesystem getAllStatistics, deprecated in Hadoop 3.2.
+      - Spark also allows to measure filesystem metrics using
+        `--conf spark.executor.metrics.fileSystemSchemes=<filesystems to measure>` (default: `file,hdfs`)
+        however in Spark (up to 3.1) this is done using Hadoop Filesystem getAllStatistics, deprecated in recent versions of Hadoop.
     - Metrics (gauges) implemented have the prefix `ch.cern.S3AMetricsGSS`. List of metrics:
        - `bytesRead`
        - `bytesWritten`
