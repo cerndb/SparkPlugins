@@ -27,7 +27,7 @@ class RunOSCommandPlugin extends SparkPlugin {
         // Run the OS command, this is an example, customize and add error and stdout management as needed
         val command = myContext.conf.get("spark.cernSparkPlugin.command", defaultCommand)
         val process = Process(command).lineStream
-        DemoPlugin.numSuccessfulPlugins += 1
+        RunOSCommandPlugin.numSuccessfulPlugins += 1
       }
 
       override def shutdown(): Unit = {
