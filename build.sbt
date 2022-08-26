@@ -1,7 +1,7 @@
 name := "spark-plugins"
 
-version := "0.2"
-isSnapshot := false
+version := "0.3-SNAPSHOT"
+isSnapshot := true
 
 scalaVersion := "2.12.15"
 crossScalaVersions := Seq("2.12.15", "2.13.8")
