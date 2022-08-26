@@ -1,15 +1,16 @@
 name := "spark-plugins"
 
-version := "0.2-SNAPSHOT"
-isSnapshot := true
+version := "0.2"
+isSnapshot := false
 
 scalaVersion := "2.12.15"
+crossScalaVersions := Seq("2.12.15", "2.13.8")
 
 licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 
-libraryDependencies += "io.dropwizard.metrics" % "metrics-core" % "4.2.0"
-libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "3.3.1"
-libraryDependencies += "org.apache.spark" %% "spark-core" % "3.2.0"
+libraryDependencies += "io.dropwizard.metrics" % "metrics-core" % "4.2.7"
+libraryDependencies += "org.apache.hadoop" % "hadoop-client-api" % "3.3.2"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "3.3.0"
 
 // publishing to Sonatype Nexus repository and Maven
 publishMavenStyle := true

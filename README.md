@@ -2,10 +2,10 @@
 ![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg?branch=master&event=push)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
-This repo contains code and examples of Apache Spark Plugins for Spark 3.x.  
-Apache Spark plugins are an interface and configuration allowing to inject custom code on executors
-start-up, with a hook to the Spark metrics system. 
-This provides a way to extend metrics collection beyond what is normally available in Apache Spark.   
+This repository contains code and examples of how to use Apache Spark Plugins.  
+Spark plugins are part of Spark core since version 3.0 and provide an interface,
+and related configuration, for injecting custom code on executors as they are initialized.
+Spark plugins can also be used to implement custom extensions to the Spark metrics system.   
 
 ### Motivations
 - Instrumenting parts of the Spark workload with plugins provides additional flexibility compared 
@@ -43,17 +43,17 @@ Spark I/O from cloud Filesystems, OS metrics, and custom application metrics.
 ---
 ## Getting Started  
 - Deploy the jar from maven central
-  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
+  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2`
 - Build or download the SparkPlugin `jar`. For example:
-  - Build from source with `sbt package`
+  - Build from source with `sbt +package`
   - Or download the jar from the automatic build in [github actions](https://github.com/cerndb/SparkPlugins/actions)
 
 ### Demo and Basic Plugins
   - [DemoPlugin](src/main/scala/ch/cern/DemoPlugin.scala)
-    - `--conf spark.plugins=ch.cern.DemoPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 --conf spark.plugins=ch.cern.DemoPlugin`
     - Basic plugin, demonstrates how to write Spark plugins in Scala, for demo and testing.
   - [DemoMetricsPlugin](src/main/scala/ch/cern/DemoMetricsPlugin.scala)
-    - `--conf spark.plugins=ch.cern.DemoMetricsPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 --conf spark.plugins=ch.cern.DemoMetricsPlugin`
     - Example plugin illustrating integration with the Spark metrics system.
     - Metrics implemented:
       - `ch.cern.DemoMetricsPlugin.DriverTest42`: a gauge reporting a constant integer value, for testing.
@@ -65,7 +65,7 @@ Spark I/O from cloud Filesystems, OS metrics, and custom application metrics.
     - Example:
       ```
       bin/spark-shell --master yarn \ 
-        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
+        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
         --conf spark.plugins=ch.cern.RunOSCommandPlugin 
       ```
         - You can see if the plugin has run by checking that the file `/tmp/plugin.txt` has been
@@ -97,8 +97,8 @@ Spark I/O from cloud Filesystems, OS metrics, and custom application metrics.
     ```
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
-      --conf spark.kubernetes.container.image=<registry>/spark:v311 \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
+      --conf spark.kubernetes.container.image=<registry>/spark:v330 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -139,7 +139,7 @@ In particular, it provides information on read locality and erasure coding usage
     - Example  
     ```
     bin/spark-shell --master yarn \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
       --conf spark.plugins=ch.cern.HDFSMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -163,7 +163,7 @@ storage system exposed as a Hadoop Compatible Filesystem).
     - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "gs", "wasbs", "root", "oci", etc.) 
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
     - Collects I/O metrics for Hadoop-compatible filesystems using Hadoop's GlobalStorageStatistics API.   
-      - Note: use this with Spark built with Hadoop 3.2 (requires Hadoop client version 2.8 or higher).
+      - Note: use this with Spark built with Hadoop 3.x (requires Hadoop client version 2.8 or higher).
       - Spark also allows to measure filesystem metrics using
         `--conf spark.executor.metrics.fileSystemSchemes=<filesystems to measure>` (default: `file,hdfs`)
         however in Spark (up to 3.1) this is done using Hadoop Filesystem getAllStatistics, deprecated in recent versions of Hadoop.
@@ -177,7 +177,7 @@ storage system exposed as a Hadoop Compatible Filesystem).
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
           --conf spark.kubernetes.container.image=<registry>/spark:v311 \
-          --packages org.apache.hadoop:hadoop-aws:3.2.0,ch.cern.sparkmeasure:spark-plugins_2.12:0.1 \
+          --packages org.apache.hadoop:hadoop-aws:3.3.2,ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
           --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
@@ -217,6 +217,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Instruments the Hadoop S3A client.
     - Note: this requires custom S3A client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)  
     - Spark config:
+      - Use this with Spark 3.1.x (which uses hadoop version 3.2.0) 
       - `--conf spark.plugins=ch.cern.experimental.S3ATimeInstrumentation`
       - Custom jar needed: `--jars hadoop-aws-3.2.0.jar` 
         - build [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
@@ -259,7 +260,8 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Instruments the Hadoop HDFS client.
     - Note: this requires custom HDFS client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Spark config:
-      - `--conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation`
+        - Use this with Spark 3.1.x (which uses hadoop version 3.2.0) 
+        - `--conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation`
       - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
       - Non-standard configuration required for using this instrumentation:  
         - replace `$SPARK_HOME/jars/hadoop-hdfs-client-3.2.0.jar` with the jar built [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
