@@ -3,16 +3,14 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
 This repository contains code and examples of how to use Apache Spark Plugins.  
-Spark plugins are part of Spark core since version 3.0 and provide an interface,
+Spark plugins provide an interface,
 and related configuration, for injecting custom code on executors as they are initialized.
 Spark plugins can also be used to implement custom extensions to the Spark metrics system.   
 
 ### Motivations
-- Instrumenting parts of the Spark workload with plugins provides additional flexibility compared 
-to extending instrumentation in the Apache Spark code, as only users who want to activate
-it can do so, moreover they can play with configuration that may be customized for their environment,
-so not necessarily suitable for all possible uses of Apache Spark code. 
-- One important use case is extending Spark instrumentation with custom metrics.  
+- One important use case for deploying Spark Plugins is extending Spark instrumentation with custom metrics.
+- Other use cases include running custom actions when the executors start up, typically useful for integrating with
+  external systems.
 - This repo provides code and examples of plugins applied to measuring Spark on K8S, 
 Spark I/O from cloud Filesystems, OS metrics, and custom application metrics.
 - Note: The code in this repo is for Spark 3.x.  
@@ -217,7 +215,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Instruments the Hadoop S3A client.
     - Note: this requires custom S3A client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)  
     - Spark config:
-      - Use this with Spark 3.1.x (which uses hadoop version 3.2.0) 
+      - **Use this with Spark 3.1.x (which uses hadoop version 3.2.0)** 
       - `--conf spark.plugins=ch.cern.experimental.S3ATimeInstrumentation`
       - Custom jar needed: `--jars hadoop-aws-3.2.0.jar` 
         - build [from this fork](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
@@ -260,7 +258,7 @@ These plugins use instrumented experimental/custom versions of the Hadoop client
     - Instruments the Hadoop HDFS client.
     - Note: this requires custom HDFS client implementation, see experimental code at: [HDFS and S3A custom instrumentation](https://github.com/LucaCanali/hadoop/tree/s3aAndHDFSTimeInstrumentation)
     - Spark config:
-        - Use this with Spark 3.1.x (which uses hadoop version 3.2.0) 
+        - **Use this with Spark 3.1.x (which uses hadoop version 3.2.0)** 
         - `--conf spark.plugins=ch.cern.experimental.HDFSTimeInstrumentation`
       - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.1`
       - Non-standard configuration required for using this instrumentation:  
