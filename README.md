@@ -6,6 +6,16 @@ This repository contains code and examples of how to use Apache Spark Plugins.
 Spark plugins provide an interface,
 and related configuration, for injecting custom code on executors as they are initialized.
 
+### Contents
+- [Getting started](#getting-started)
+- [Demo and basic plugins](#demo-and-basic-plugins)
+- [Plugin for integrating Pyroscope with Spark](#plugin-for-integrating-with-pyroscope)
+- [Plugin for OS metrics instrumentation with cgroups for Spark on Kubernetes](#os-metrics-instrumentation-with-cgroups-for-spark-on-kubernetes)
+- [Plugin to collect I/O storage statistics for HDFS and Hadoop-compatible filesystems](#plugins-to-collect-io-storage-statistics-for-hdfs-and-hadoop-compatible-filesystems)
+- [Plugin for Cloud filesystem storage statistics](#cloud-filesystem-storage-statistics-for-hadoop-compatible-filesystems)
+- [Experimental plugins](#experimental-plugins-for-io-time-instrumentation)
+
+---
 ### Motivations
 - One important use case for deploying Spark Plugins is extending Spark instrumentation with custom metrics.
 - Other use cases include running custom actions when the executors start up, typically useful for integrating with
@@ -115,7 +125,7 @@ spark = (SparkSession.builder.
       .getOrCreate()
     )
 ```
-
+---
 ### OS metrics instrumentation with cgroups, for Spark on Kubernetes 
   - [CgroupMetrics](src/main/scala/ch/cern/CgroupMetrics.scala)
     - Configure with: `--conf spark.plugins=ch.cern.CgroupMetrics`
@@ -154,6 +164,7 @@ spark = (SparkSession.builder.
    - Visualize the metrics using the [Spark dashboard](https://github.com/cerndb/spark-dashboard),
      see `Spark_Perf_Dashboard_v03_with_SparkPlugins`
 
+---
 ### Plugins to collect I/O storage statistics for HDFS and Hadoop Compatible Filesystems
 
 #### HDFS extended storage statistics
@@ -194,8 +205,8 @@ In particular, it provides information on read locality and erasure coding usage
 
    - Visualize the metrics using the [Spark dashboard](https://github.com/cerndb/spark-dashboard),
      see `Spark_Perf_Dashboard_v03_with_SparkPlugins`
-          
 
+---
 ### Cloud filesystem storage statistics for Hadoop Compatible Filesystems
 #### [CloudFSMetrics](src/main/scala/ch/cern/CloudFSMetrics.scala)
 This Plugin provides I/O statistics for Cloud Filesystem metrics (for s3a, gs, wasbs, oci, root, and any other
