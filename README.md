@@ -40,17 +40,17 @@ and related configuration, for injecting custom code on executors as they are in
 ---
 ## Getting Started  
 - Deploy the jar from maven central
-  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2`
+  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3`
 - Build or download the SparkPlugin `jar`. For example:
   - Build from source with `sbt +package`
   - Or download the jar from the automatic build in [github actions](https://github.com/cerndb/SparkPlugins/actions)
 
 ### Demo and Basic Plugins
   - [DemoPlugin](src/main/scala/ch/cern/DemoPlugin.scala)
-    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 --conf spark.plugins=ch.cern.DemoPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 --conf spark.plugins=ch.cern.DemoPlugin`
     - Basic plugin, demonstrates how to write Spark plugins in Scala, for demo and testing.
   - [DemoMetricsPlugin](src/main/scala/ch/cern/DemoMetricsPlugin.scala)
-    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 --conf spark.plugins=ch.cern.DemoMetricsPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 --conf spark.plugins=ch.cern.DemoMetricsPlugin`
     - Example plugin illustrating integration with the Spark metrics system.
     - Metrics implemented:
       - `ch.cern.DemoMetricsPlugin.DriverTest42`: a gauge reporting a constant integer value, for testing.
@@ -62,7 +62,7 @@ and related configuration, for injecting custom code on executors as they are in
     - Example:
       ```
       bin/spark-shell --master yarn \ 
-        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
+        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
         --conf spark.plugins=ch.cern.RunOSCommandPlugin 
       ```
         - You can see if the plugin has run by checking that the file `/tmp/plugin.txt` has been
@@ -141,7 +141,7 @@ spark = (SparkSession.builder.
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
       --conf spark.kubernetes.container.image=<registry>/spark:v330 \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -182,7 +182,7 @@ In particular, it provides information on read locality and erasure coding usage
     - Example  
     ```
     bin/spark-shell --master yarn \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
       --conf spark.plugins=ch.cern.HDFSMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -220,7 +220,7 @@ storage system exposed as a Hadoop Compatible Filesystem).
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
           --conf spark.kubernetes.container.image=<registry>/spark:v311 \
-          --packages org.apache.hadoop:hadoop-aws:3.3.2,ch.cern.sparkmeasure:spark-plugins_2.12:0.2 \
+          --packages org.apache.hadoop:hadoop-aws:3.3.2,ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
           --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
