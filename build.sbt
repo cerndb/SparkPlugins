@@ -10,7 +10,7 @@ licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 
 libraryDependencies += "io.dropwizard.metrics" % "metrics-core" % "4.2.19"
 libraryDependencies += "org.apache.hadoop" % "hadoop-client-api" % "3.3.4"
-libraryDependencies += "io.pyroscope" % "agent" % "0.12.0"
+libraryDependencies += "io.pyroscope" % "agent" % "0.12.2"
 libraryDependencies += "org.apache.spark" %% "spark-core" % "3.5.0"
 
 // publishing to Sonatype Nexus repository and Maven

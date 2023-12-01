@@ -2,9 +2,9 @@
 ![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg?branch=master&event=push)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
-This repository contains code and examples of how to use Apache Spark Plugins.    
-Spark plugins provide an interface,
-and related configuration, for injecting custom code on executors as they are initialized.
+This repository offers extensive resources for utilizing Plugins for Apache Spark, which are essential for incorporating custom code into executors during initialization.  
+The primary motivation behind Spark Plugins is to extend Spark's capabilities in terms of instrumentation and integration with various external systems.
+nal systems, such as monitoring tools.
 
 ### Contents
 - [Getting started](#getting-started)
@@ -16,14 +16,13 @@ and related configuration, for injecting custom code on executors as they are in
 - [Experimental plugins](#experimental-plugins-for-io-time-instrumentation)
 
 ---
-### Motivations
-- One important use case for deploying Spark Plugins is extending Spark instrumentation with custom metrics.
-- Other use cases include running custom actions when the executors start up, typically useful for integrating with
+### Motivations and key use cases
+- **Extending Spark instrumentation** with custom metrics
+- **Running custom actions** when the executors start up, typically useful for integrating with
   external systems, such as monitoring systems.
 - This repo provides code and examples of plugins applied to measuring Spark on cluster resources (YARN, K8S, Standalone), 
   including measuring Spark I/O from cloud Filesystems, OS metrics, custom application metrics, and integrations with external systems like Pyroscope.
-- Note: The code in this repo is for Spark 3.x.  
-   For Spark 2.x, see instead [Executor Plugins for Spark 2.4](https://github.com/cerndb/SparkExecutorPlugins2.4)
+- The code in this repo is for Spark 3.x. For Spark 2.x, see instead [Executor Plugins for Spark 2.4](https://github.com/cerndb/SparkExecutorPlugins2.4)
 
 ### Implementation Notes:
 - Spark plugins implement the `org.apache.spark.api.Plugin` interface, they can be written in Scala or Java
