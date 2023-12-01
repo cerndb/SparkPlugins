@@ -3,8 +3,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
 This repository offers extensive resources for utilizing Plugins for Apache Spark, which are essential for incorporating custom code into executors during initialization.  
-The primary motivation behind Spark Plugins is to extend Spark's capabilities in terms of instrumentation and integration with various external systems.
-nal systems, such as monitoring tools.
+The primary motivation behind Spark Plugins is to extend Spark's capabilities in terms of instrumentation and integration with 
+various external systems, such as monitoring tools.
 
 ### Contents
 - [Getting started](#getting-started)
