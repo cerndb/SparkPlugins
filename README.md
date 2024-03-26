@@ -2,27 +2,36 @@
 ![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg?branch=master&event=push)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
-This repository offers extensive resources for utilizing Plugins for Apache Spark, which are essential for incorporating custom code into executors during initialization.  
-The primary motivation behind Spark Plugins is to extend Spark's capabilities in terms of instrumentation and integration with 
-various external systems, such as monitoring tools.
+Use Spark Plugins to extend Apache Spark with custom metrics and executors' startup actions.
+
+### Key Features
+
+- **Spark Plugins** are a mechanism to extend Apache Spark with custom code for metrics and actions.
+- This repository provides examples of plugins that you can deploy to extend Spark with custom metrics and actions.
+  - **Extending Spark instrumentation** with custom metrics
+  - **Running custom actions** when the executors start up, typically useful for integrating with
+    external systems, such as monitoring systems.
+  - This repo provides code and examples of plugins applied to measuring Spark on cluster resources (YARN, K8S, Standalone), 
+    including measuring Spark I/O from cloud Filesystems, OS metrics, custom application metrics, and integrations with external systems like Pyroscope.
+- The code in this repo is for Spark 3.x. For Spark 2.x, see instead [Executor Plugins for Spark 2.4](https://github.com/cerndb/SparkExecutorPlugins2.4)
 
 ### Contents
-- [Getting started](#getting-started)
+- [Getting started](#getting-started---your-first-spark-plugins)
 - [Demo and basic plugins](#demo-and-basic-plugins)
 - [Plugin for integrating Pyroscope with Spark](#plugin-for-integrating-with-pyroscope)
-- [Plugin for OS metrics instrumentation with cgroups for Spark on Kubernetes](#os-metrics-instrumentation-with-cgroups-for-spark-on-kubernetes)
+- [Plugin for OS metrics instrumentation with Cgroups for Spark on Kubernetes](#os-metrics-instrumentation-with-cgroups-for-spark-on-kubernetes)
 - [Plugin to collect I/O storage statistics for HDFS and Hadoop-compatible filesystems](#plugins-to-collect-io-storage-statistics-for-hdfs-and-hadoop-compatible-filesystems)
 - [Plugin for Cloud filesystem storage statistics](#cloud-filesystem-storage-statistics-for-hadoop-compatible-filesystems)
 - [Experimental plugins](#experimental-plugins-for-io-time-instrumentation)
 
----
-### Motivations and key use cases
-- **Extending Spark instrumentation** with custom metrics
-- **Running custom actions** when the executors start up, typically useful for integrating with
-  external systems, such as monitoring systems.
-- This repo provides code and examples of plugins applied to measuring Spark on cluster resources (YARN, K8S, Standalone), 
-  including measuring Spark I/O from cloud Filesystems, OS metrics, custom application metrics, and integrations with external systems like Pyroscope.
-- The code in this repo is for Spark 3.x. For Spark 2.x, see instead [Executor Plugins for Spark 2.4](https://github.com/cerndb/SparkExecutorPlugins2.4)
+### Resources
+
+- Spark Performance Dashboard - a solution to ingest and visualize Spark metrics
+    - link to the repo on [how to deploy a Spark Performance Dashboard using Spark metrics](https://github.com/cerndb/spark-dashboard)
+- DATA+AI summit 2020 talk [What is New with Apache Spark Performance Monitoring in Spark 3.0](https://databricks.com/session_eu20/what-is-new-with-apache-spark-performance-monitoring-in-spark-3-0)
+- DATA+AI summit 2021 talk [Monitor Apache Spark 3 on Kubernetes using Metrics and Plugins](https://databricks.com/session_na21/monitor-apache-spark-3-on-kubernetes-using-metrics-and-plugins)
+
+Author and contact: Luca.Canali@cern.ch 
 
 ### Implementation Notes:
 - Spark plugins implement the `org.apache.spark.api.Plugin` interface, they can be written in Scala or Java
@@ -37,18 +46,9 @@ various external systems, such as monitoring tools.
       namespace `namespace=plugin.<Plugin Class Name>`
 - See also: [SPARK-29397](https://issues.apache.org/jira/browse/SPARK-29397), [SPARK-28091](https://issues.apache.org/jira/browse/SPARK-28091), [SPARK-32119](https://issues.apache.org/jira/browse/SPARK-32119).
 
-### Related Work and Spark Performance Dashboard
-
-- Spark Performance Dashboard - a solution to ingest and visualize Spark metrics
-    - link to the repo on [how to deploy a Spark Performance Dashboard using Spark metrics](https://github.com/cerndb/spark-dashboard)
-- DATA+AI summit 2020 talk [What is New with Apache Spark Performance Monitoring in Spark 3.0](https://databricks.com/session_eu20/what-is-new-with-apache-spark-performance-monitoring-in-spark-3-0)
-- DATA+AI summit 2021 talk [Monitor Apache Spark 3 on Kubernetes using Metrics and Plugins](https://databricks.com/session_na21/monitor-apache-spark-3-on-kubernetes-using-metrics-and-plugins)
-
-**Author and contact:** Luca.Canali@cern.ch 
-
 ---
-## Getting Started  
-- Deploy the jar from maven central
+## Getting Started - Your First Spark Plugins  
+- Deploy the code of the Spark plugins described here using from maven central
   - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3`
 - Build or download the SparkPlugin `jar`. For example:
   - Build from source with `sbt +package`
