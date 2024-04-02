@@ -94,7 +94,7 @@ continuous monitoring. Example:
 2. Spark Spark (spark-shell, PySpark, spark-submit
 ```
 bin/spark-shell --master yarn  \
-  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.12.0 \ # update to use the latest versions
+  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.13.0 \ # update to use the latest versions
   --conf spark.plugins=ch.cern.PyroscopePlugin \
   --conf spark.pyroscope.server="http://<myhostname>:5040" # match with the server and port used when starting Pyroscope
 ```
@@ -118,7 +118,7 @@ spark = (SparkSession.builder.
       .config("spark.executor.memory","16g")
       .config("spark.executor.cores","4")
       .config("spark.executor.instances", 2)
-      .config("spark.jars.packages", "ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.12.0")
+      .config("spark.jars.packages", "ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.13.0")
       .config("spark.plugins", "ch.cern.PyroscopePlugin")
       .config("spark.pyroscope.server", "http://<myhostname>:5040")
       .getOrCreate()
