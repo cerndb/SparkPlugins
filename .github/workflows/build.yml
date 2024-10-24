@@ -25,13 +25,12 @@ jobs:
 
     - name: Build using sbt for all Scala versions supported
       run: sbt +package
+
     - uses: actions/upload-artifact@v4
       with:
-        name: SparkPlugins package scala 2.13
+        name: SparkPlugins package scala 2.13 - java ${{ matrix.java-version }}
         path: target/scala-2.13/*.jar
     - uses: actions/upload-artifact@v4
       with:
-        name: SparkPlugins package scala 2.12
+        name: SparkPlugins package scala 2.12 - java ${{ matrix.java-version }}
         path: target/scala-2.12/*.jar
-
-        
