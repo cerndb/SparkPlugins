@@ -15,21 +15,21 @@ jobs:
         java-version: [ 8, 11, 17 ]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Java ${{ matrix.java-version }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'adopt'
         java-version: ${{ matrix.java-version }}
 
     - name: Build using sbt for all Scala versions supported
       run: sbt +package
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: SparkPlugins package scala 2.13
         path: target/scala-2.13/*.jar
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: SparkPlugins package scala 2.12
         path: target/scala-2.12/*.jar
