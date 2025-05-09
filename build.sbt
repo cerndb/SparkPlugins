@@ -12,8 +12,8 @@ val slf4jVersion   = "2.0.17"
 // ─── Project coordinates ────────────────────────────────────────────────────
 name                 := "spark-plugins"
 organization         := "ch.cern.sparkmeasure"
-version              := "0.4"
-isSnapshot           := false
+version              := "0.5-SNAPSHOT"
+isSnapshot           := true
 scalaVersion         := scala212
 crossScalaVersions   := Seq(scala212, scala213)
 publishMavenStyle    := true

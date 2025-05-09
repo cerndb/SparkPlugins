@@ -1,5 +1,6 @@
 # SparkPlugins
-![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg?branch=master&event=push)
+![SparkPlugins CI](https://github.com/cerndb/SparkPlugins/workflows/SparkPlugins%20CI/badge.svg)
+[![DOI](https://zenodo.org/badge/219974405.svg)](https://doi.org/10.5281/zenodo.15374785)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.cern.sparkmeasure/spark-plugins_2.12)
 
 **Spark Plugins** are an Apache Spark feature for extending Spark with custom metrics and actions.
@@ -32,19 +33,53 @@ This repository provides ready-to-use examples for deploying Spark plugins acros
 Author and contact: Luca.Canali@cern.ch 
 
 ---
-## Getting Started - Your First Spark Plugins  
-- Deploy the code of the Spark plugins described here using from maven central
-  - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3`
-- Build or download the SparkPlugin `jar`. For example:
-  - Build from source with `sbt +package`
-  - Or download the jar from the automatic build in [github actions](https://github.com/cerndb/SparkPlugins/actions)
+## Getting Started - Your First Spark Plugins
+
+To begin using Spark plugins from this repository, follow these steps:
+
+### 1. Deploying Spark Plugins
+
+You can deploy the Spark plugins directly using Maven Central:
+
+#### For Scala 2.12:
+
+```bash
+spark-shell --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4
+```
+
+#### For Scala 2.13:
+
+```bash
+spark-shell --packages ch.cern.sparkmeasure:spark-plugins_2.13:0.4
+```
+
+### 2. Building or Downloading the SparkPlugin JAR
+
+You can either build the JAR from the source or download it directly:
+
+#### Option 1: Build from Source
+
+* Make sure you have [SBT (Scala Build Tool)](https://www.scala-sbt.org/) installed.
+* Run the following command:
+
+```bash
+sbt +package
+```
+
+#### Option 2: Download from GitHub 
+
+* See jars in the [Release version 0.4](https://github.com/cerndb/SparkPlugins/releases/tag/v0.4)
+* Or visit the [GitHub Actions page](https://github.com/cerndb/SparkPlugins/actions) for this repository and 
+  locate the latest successful build and download the JAR file.
+
+---
 
 ### Demo and Basic Plugins
   - [DemoPlugin](src/main/scala/ch/cern/DemoPlugin.scala)
-    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 --conf spark.plugins=ch.cern.DemoPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4 --conf spark.plugins=ch.cern.DemoPlugin`
     - Basic plugin, demonstrates how to write Spark plugins in Scala, for demo and testing.
   - [DemoMetricsPlugin](src/main/scala/ch/cern/DemoMetricsPlugin.scala)
-    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 --conf spark.plugins=ch.cern.DemoMetricsPlugin`
+    - `--packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4 --conf spark.plugins=ch.cern.DemoMetricsPlugin`
     - Example plugin illustrating integration with the Spark metrics system.
     - Metrics implemented:
       - `ch.cern.DemoMetricsPlugin.DriverTest42`: a gauge reporting a constant integer value, for testing.
@@ -56,7 +91,7 @@ Author and contact: Luca.Canali@cern.ch
     - Example:
       ```
       bin/spark-shell --master yarn \ 
-        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
+        --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4 \
         --conf spark.plugins=ch.cern.RunOSCommandPlugin 
       ```
         - You can see if the plugin has run by checking that the file `/tmp/plugin.txt` has been
@@ -93,7 +128,7 @@ continuous monitoring. Example:
 2. Spark Spark (spark-shell, PySpark, spark-submit
 ```
 bin/spark-shell --master yarn  \
-  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:2.1.2 \ # update to use the latest versions
+  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4,io.pyroscope:agent:2.1.2 \ # update to use the latest versions
   --conf spark.plugins=ch.cern.PyroscopePlugin \
   --conf spark.pyroscope.server="http://<myhostname>:5040" # match with the server and port used when starting Pyroscope
 ```
@@ -117,7 +152,7 @@ spark = (SparkSession.builder.
       .config("spark.executor.memory","16g")
       .config("spark.executor.cores","4")
       .config("spark.executor.instances", 2)
-      .config("spark.jars.packages", "ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.13.0")
+      .config("spark.jars.packages", "ch.cern.sparkmeasure:spark-plugins_2.12:0.4,io.pyroscope:agent:0.13.0")
       .config("spark.plugins", "ch.cern.PyroscopePlugin")
       .config("spark.pyroscope.server", "http://<myhostname>:5040")
       .getOrCreate()
@@ -149,7 +184,7 @@ spark = (SparkSession.builder.
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
       --conf spark.kubernetes.container.image=<registry>/spark:v355 \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -191,7 +226,7 @@ In particular, it provides information on read locality and erasure coding usage
     - Example  
     ```
     bin/spark-shell --master yarn \
-      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
+      --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.4 \
       --conf spark.plugins=ch.cern.HDFSMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \
       --conf "spark.metrics.conf.*.sink.graphite.host"=mytestinstance \
@@ -229,7 +264,7 @@ storage system exposed as a Hadoop Compatible Filesystem).
          bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
           --num-executors 2 --executor-cores 2 --executor-memory 2g \
           --conf spark.kubernetes.container.image=<registry>/spark:v311 \
-          --packages org.apache.hadoop:hadoop-aws:3.3.2,ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
+          --packages org.apache.hadoop:hadoop-aws:3.3.2,ch.cern.sparkmeasure:spark-plugins_2.12:0.4 \
           --conf spark.plugins=ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics \
           --conf spark.cernSparkPlugin.cloudFsName="s3a" \
           --conf spark.hadoop.fs.s3a.secret.key="<SECRET KEY HERE>" \
