@@ -12,8 +12,8 @@ val slf4jVersion   = "2.0.17"
 // ─── Project coordinates ────────────────────────────────────────────────────
 name                 := "spark-plugins"
 organization         := "ch.cern.sparkmeasure"
-version              := "0.4-SNAPSHOT"
-isSnapshot           := true
+version              := "0.4"
+isSnapshot           := false
 scalaVersion         := scala212
 crossScalaVersions   := Seq(scala212, scala213)
 publishMavenStyle    := true
@@ -30,7 +30,16 @@ libraryDependencies ++= Seq(
   "org.slf4j"                    % "slf4j-api"             % slf4jVersion
 )
 
-// ─── Metadata ───────────────────────────────────────────────────────────────
+// ─── Publishing to Sonatype OSSRH ────────────────────────────────────────────
+publishTo := Some {
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeOssSnapshots.head
+  else
+    Opts.resolver.sonatypeStaging
+}
+
+// ─── Project metadata ─────────────────────────────────────────────────────────
+organization := "ch.cern.sparkmeasure"
 description := "Use Spark Plugins to extend Apache Spark with custom metrics and executors' startup actions."
 
 homepage   := Some(url("https://github.com/cerndb/SparkPlugins"))
@@ -49,11 +58,3 @@ scmInfo := Some(
     connection = "scm:git@github.com:cerndb/SparkPlugins.git"
   )
 )
-
-// ─── Publishing to Sonatype OSSRH ────────────────────────────────────────────
-publishTo := Some {
-  if (isSnapshot.value)
-    Opts.resolver.sonatypeOssSnapshots.head
-  else
-    Opts.resolver.sonatypeStaging
-}
