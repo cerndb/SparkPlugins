@@ -94,7 +94,7 @@ continuous monitoring. Example:
 2. Spark Spark (spark-shell, PySpark, spark-submit
 ```
 bin/spark-shell --master yarn  \
-  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:0.13.0 \ # update to use the latest versions
+  --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3,io.pyroscope:agent:2.1.2 \ # update to use the latest versions
   --conf spark.plugins=ch.cern.PyroscopePlugin \
   --conf spark.pyroscope.server="http://<myhostname>:5040" # match with the server and port used when starting Pyroscope
 ```
@@ -149,7 +149,7 @@ spark = (SparkSession.builder.
     ```
     bin/spark-shell --master k8s://https://<K8S URL>:6443 --driver-memory 1g \ 
       --num-executors 2 --executor-cores 2 --executor-memory 2g \
-      --conf spark.kubernetes.container.image=<registry>/spark:v330 \
+      --conf spark.kubernetes.container.image=<registry>/spark:v355 \
       --packages ch.cern.sparkmeasure:spark-plugins_2.12:0.3 \
       --conf spark.plugins=ch.cern.HDFSMetrics,ch.cern.CgroupMetrics \
       --conf "spark.metrics.conf.*.sink.graphite.class"="org.apache.spark.metrics.sink.GraphiteSink"   \

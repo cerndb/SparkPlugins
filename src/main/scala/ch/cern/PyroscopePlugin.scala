@@ -5,9 +5,9 @@ import io.pyroscope.javaagent.EventType
 import io.pyroscope.javaagent.config.Config
 import io.pyroscope.http.Format
 
+import scala.jdk.CollectionConverters._
 import java.net.InetAddress
 import java.util.{Map => JMap}
-import scala.collection.JavaConverters._
 
 import org.apache.spark.api.plugin.{DriverPlugin, ExecutorPlugin, PluginContext, SparkPlugin}
 import org.apache.spark.SparkContext

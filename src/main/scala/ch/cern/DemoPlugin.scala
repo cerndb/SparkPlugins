@@ -1,7 +1,7 @@
 package ch.cern
 
+import scala.jdk.CollectionConverters._
 import java.util.{Map => JMap}
-import scala.collection.JavaConverters._
 
 import org.apache.spark.api.plugin.{DriverPlugin, ExecutorPlugin, PluginContext, SparkPlugin}
 import org.apache.spark.SparkContext

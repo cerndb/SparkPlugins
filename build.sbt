@@ -1,39 +1,59 @@
-name := "spark-plugins"
+/****************************************
+ *  spark‑plugins – build definition    *
+ ****************************************/
 
-version := "0.4-SNAPSHOT"
-isSnapshot := true
+// ─── Versions ────────────────────────────────────────────────────────────────
+val sparkVersion   = "3.5.5"
+val scala212       = "2.12.18"
+val scala213       = "2.13.8"
+val jacksonVersion = "2.18.3"
+val slf4jVersion   = "2.0.17"
 
-scalaVersion := "2.12.18"
-crossScalaVersions := Seq("2.12.18", "2.13.8")
+// ─── Project coordinates ────────────────────────────────────────────────────
+name                 := "spark-plugins"
+organization         := "ch.cern.sparkmeasure"
+version              := "0.4-SNAPSHOT"
+isSnapshot           := true
+scalaVersion         := scala212
+crossScalaVersions   := Seq(scala212, scala213)
+publishMavenStyle    := true
 
-licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
-
-libraryDependencies += "io.dropwizard.metrics" % "metrics-core" % "4.2.19"
-libraryDependencies += "org.apache.hadoop" % "hadoop-client-api" % "3.3.4"
-libraryDependencies += "io.pyroscope" % "agent" % "0.13.0"
-libraryDependencies += "org.apache.spark" %% "spark-core" % "3.5.1"
-
-// publishing to Sonatype Nexus repository and Maven
-publishMavenStyle := true
-
-organization := "ch.cern.sparkmeasure"
-description := "SparkPlugins provides code and examples of how to deploy Apache Spark Plugins. Notably focusing on extensions to the metrics system applied to measuring I/O from cloud Filesystems, OS/system metrics and custom metrics."
-developers := List(Developer(
-  "LucaCanali", "Luca Canali", "Luca.Canali@cern.ch",
-  url("https://github.com/LucaCanali")
-))
-homepage := Some(url("https://github.com/cerndb/SparkPlugins"))
-
-publishTo := Some(
-  if (isSnapshot.value)
-    Opts.resolver.sonatypeSnapshots
-  else
-    Opts.resolver.sonatypeStaging
+// ─── Dependencies ────────────────────────────────────────────────────────────
+// NOTE: Spark JARs are marked 'provided' because the cluster supplies them.
+libraryDependencies ++= Seq(
+  "org.apache.spark"            %% "spark-core"            % sparkVersion % Provided,
+  "org.apache.spark"            %% "spark-sql"             % sparkVersion % Provided,
+  "io.dropwizard.metrics"        % "metrics-core"          % "4.2.19",
+  "org.apache.hadoop"            % "hadoop-client-api"     % "3.3.4",
+  "io.pyroscope"                 % "agent"                 % "2.1.2",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+  "org.slf4j"                    % "slf4j-api"             % slf4jVersion
 )
 
-scmInfo := Some(
-  ScmInfo(
-    url("https://github.com/cerndb/SparkPlugins"),
-    "scm:git@github.com:cerndb/SparkPlugins.git"
+// ─── Metadata ───────────────────────────────────────────────────────────────
+description := "Use Spark Plugins to extend Apache Spark with custom metrics and executors' startup actions."
+
+homepage   := Some(url("https://github.com/cerndb/SparkPlugins"))
+licenses   += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+developers := List(
+  Developer(
+    id    = "LucaCanali",
+    name  = "Luca Canali",
+    email = "Luca.Canali@cern.ch",
+    url("https://github.com/LucaCanali")
   )
 )
+scmInfo := Some(
+  ScmInfo(
+    browseUrl  = url("https://github.com/cerndb/SparkPlugins"),
+    connection = "scm:git@github.com:cerndb/SparkPlugins.git"
+  )
+)
+
+// ─── Publishing to Sonatype OSSRH ────────────────────────────────────────────
+publishTo := Some {
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeOssSnapshots.head
+  else
+    Opts.resolver.sonatypeStaging
+}

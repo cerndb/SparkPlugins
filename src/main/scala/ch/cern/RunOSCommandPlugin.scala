@@ -44,4 +44,3 @@ object RunOSCommandPlugin {
   var numSuccessfulPlugins : Int = 0
   var numSuccessfulTerminations: Int = 0
 }
-

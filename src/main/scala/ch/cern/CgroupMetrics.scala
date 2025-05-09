@@ -1,7 +1,7 @@
 package ch.cern
 
+import scala.jdk.CollectionConverters._
 import java.util.{Map => JMap}
-import scala.collection.JavaConverters._
 
 import com.codahale.metrics.{Gauge, MetricRegistry}
 import org.apache.spark.SparkContext
@@ -20,7 +20,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("CPUTimeNanosec"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val firstLine = procFile.getLines().next
+        val firstLine = procFile.getLines().next()
         val cpuTimeNs = firstLine.toLong
         procFile.close()
         cpuTimeNs
@@ -35,7 +35,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("MemoryRss"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val data = procFile.getLines.filter(_.contains("total_rss"))
+        val data = procFile.getLines().filter(_.contains("total_rss"))
           .map(_.split(" ")).map { case Array(k, v) => k -> v.toLong }.toMap
         val rssMemory = data("total_rss")
         procFile.close()
@@ -46,7 +46,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("MemorySwap"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val data = procFile.getLines.filter(_.contains("total_swap"))
+        val data = procFile.getLines().filter(_.contains("total_swap"))
           .map(_.split(" ")).map { case Array(k, v) => k -> v.toLong }.toMap
         val swapMemory = data("total_swap")
         procFile.close()
@@ -57,7 +57,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("MemoryCache"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val data = procFile.getLines.filter(_.contains("total_cache"))
+        val data = procFile.getLines().filter(_.contains("total_cache"))
           .map(_.split(" ")).map { case Array(k, v) => k -> v.toLong }.toMap
         val cacheMemory = data("total_cache")
         procFile.close()
@@ -73,7 +73,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("NetworkBytesIn"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val data = procFile.getLines.toList.map(_.split(" "))
+        val data = procFile.getLines().toList.map(_.split(" "))
         val headersIpExt = data(2)
         val dataIpExt = data(3)
         val inOctets = dataIpExt(headersIpExt.indexOf("InOctets")).toLong
@@ -85,7 +85,7 @@ class CgroupMetrics extends SparkPlugin {
     metricRegistry.register(MetricRegistry.name("NetworkBytesOut"), new Gauge[Long] {
       override def getValue: Long = {
         val procFile = Source.fromFile(procFileName)
-        val data = procFile.getLines.toList.map(_.split(" "))
+        val data = procFile.getLines().toList.map(_.split(" "))
         val headersIpExt = data(2)
         val dataIpExt = data(3)
         val outOctets = dataIpExt(headersIpExt.indexOf("OutOctets")).toLong
