@@ -248,17 +248,6 @@ storage system exposed as a Hadoop Compatible Filesystem).
     - Visualize the metrics using the [Spark dashboard](https://github.com/cerndb/spark-dashboard),
       see `Spark_Perf_Dashboard_v03_with_SparkPlugins`
 
-
-#### [CloudFSMetrics27](src/main/scala/ch/cern/CloudFSMetrics27.scala) 
-This Plugin provides I/O statistics for Cloud Filesystem metrics (for s3a, gs, wasbs, oci, root, and any other
-storage system exposed as a Hadoop Compatible Filesystem). Use this for Spark built using Hadoop 2.7.
-  - Configure with:
-    - `--conf spark.plugins=ch.cern.CloudFSMetrics27`
-    - `--conf spark.cernSparkPlugin.cloudFsName=<name of the filesystem>` (example: "s3a", "oci", "gs", "root", etc.)
-    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default true)  
-    - Collects I/O metrics for Hadoop-compatible filesystem using Hadoop 2.7 API, use with Spark built with Hadoop 2.7
-    - The metrics are the same as for CloudFSMetrics described above, with except for the prefix: `ch.cern.CloudFSMetrics27`.
-
 ---
 ## Experimental Plugins for I/O Time Instrumentation
 
