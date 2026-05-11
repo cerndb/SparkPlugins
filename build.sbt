@@ -27,7 +27,8 @@ libraryDependencies ++= Seq(
   "org.apache.hadoop"            % "hadoop-client-api"     % "3.3.4",
   "io.pyroscope"                 % "agent"                 % "2.1.2",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-  "org.slf4j"                    % "slf4j-api"             % slf4jVersion
+  "org.slf4j"                    % "slf4j-api"             % slf4jVersion,
+  "org.scalatest"                %% "scalatest"            % "3.2.19" % Test
 )
 
 // ─── Publishing to Sonatype OSSRH ────────────────────────────────────────────

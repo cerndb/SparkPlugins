@@ -163,15 +163,20 @@ spark = (SparkSession.builder.
   - [CgroupMetrics](src/main/scala/ch/cern/CgroupMetrics.scala)
     - Configure with: `--conf spark.plugins=ch.cern.CgroupMetrics`
     - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)
-    - Implemented using cgroup instrumentation of key system resource usage, intended mostly for
-      Spark on Kubernetes
-    - Collects metrics using CGroup stats from `/sys/fs` and from `/proc` filesystem 
-      for CPU, Memory and Network usage. See also [kernel documentation](https://www.kernel.org/doc/Documentation/cgroup-v1)
-      Note: the metrics are reported for the entire cgroup to which the executor belongs to. This is mostly
-      intended for Spark running on Kubernetes. In other cases, the metrics reported
-      may not be easily correlated with executor's activity, as the cgroup metrics may include more
-      processes, up to the entire system.
-    - Metrics implemented (gauges), with prefix `ch.cern.CgroupMetrics`:
+    - Implemented using cgroups v1 instrumentation of key system resource usage, intended mostly for
+      Spark on Kubernetes. Use this plugin on systems that mount per-controller cgroup v1 hierarchies.
+  - [CgroupMetricsV2](src/main/scala/ch/cern/CgroupMetricsV2.scala)
+    - Configure with: `--conf spark.plugins=ch.cern.CgroupMetricsV2`
+    - Optional configuration: `--conf spark.cernSparkPlugin.registerOnDriver` (default false)
+    - Implemented using cgroups v2 unified hierarchy instrumentation for more recent Linux versions.
+  - Both plugins collect metrics using CGroup stats from `/sys/fs` and from `/proc` filesystem 
+    for CPU, Memory and Network usage. See also [kernel documentation](https://www.kernel.org/doc/Documentation/cgroup-v1)
+    and [cgroups v2 documentation](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html).
+    Note: the metrics are reported for the entire cgroup to which the executor belongs to. This is mostly
+    intended for Spark running on Kubernetes. In other cases, the metrics reported
+    may not be easily correlated with executor's activity, as the cgroup metrics may include more
+    processes, up to the entire system.
+  - Metrics implemented (gauges), with prefix `ch.cern.CgroupMetrics` or `ch.cern.CgroupMetricsV2`:
       - `CPUTimeNanosec`: reports the CPU time used by the processes in the cgroup.
       - `MemoryRss`: number of bytes of anonymous and swap cache memory.
       - `MemorySwap`: number of bytes of swap usage.
